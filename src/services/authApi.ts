@@ -15,7 +15,7 @@ export const loginUser = async (userData: {
   password: string;
 }) => {
   const response = await api.post(
-    "/api/auth/login",
+    "/auth/login",
     userData
   );
 

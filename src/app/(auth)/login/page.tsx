@@ -1,94 +1,117 @@
 "use client";
 
+import { FormEvent, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Dumbbell, Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { useState } from "react";
+import { Dumbbell, Eye, EyeOff } from "lucide-react";
+
+import type { RootState, AppDispatch } from "@/store/store";
+import { login } from "@/store/slices/authSlice";
 
 export default function LoginPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  const { loading, error } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const result = await dispatch(login(formData));
+    
+    if (login.fulfilled.match(result)) {
+      router.push("/dashboard");
+    }
+  };
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black px-4 py-8 text-white">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <div className="w-full max-w-md">
+
         {/* Logo */}
         <div className="mb-8 text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2"
-          >
-            <Dumbbell
-              size={28}
-              className="text-red-500"
-            />
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-red-600">
+              <Dumbbell size={28} />
+            </div>
+          </div>
 
-            <span className="text-2xl font-bold">
-              Iron<span className="text-red-500">Mind</span>
-            </span>
-          </Link>
+          <h1 className="text-3xl font-bold text-white">
+            Iron<span className="text-red-500">Mind</span>
+          </h1>
 
-          <p className="mt-3 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-500">
             Welcome back. Continue your fitness journey.
           </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-8">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">
-              Welcome <span className="text-red-500">Back</span>
-            </h1>
+        {/* Login Card */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
 
-            <p className="mt-2 text-sm text-zinc-500">
-              Login to your IronMind account.
-            </p>
-          </div>
-
-          <form className="space-y-5">
             {/* Email */}
             <div>
-              <label className="text-sm font-medium text-zinc-300">
-                Email Address
+              <label className="mb-2 block text-sm text-zinc-300">
+                Email
               </label>
 
-              <div className="relative mt-2">
-                <Mail
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
-                />
-
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-zinc-600 transition focus:border-red-500"
-                />
-              </div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                required
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500"
+              />
             </div>
 
             {/* Password */}
             <div>
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-zinc-300">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="block text-sm text-zinc-300">
                   Password
                 </label>
 
                 <button
                   type="button"
-                  className="text-xs text-red-500 transition hover:text-red-400"
+                  className="text-xs text-red-500 hover:text-red-400"
                 >
                   Forgot password?
                 </button>
               </div>
 
-              <div className="relative mt-2">
-                <Lock
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
-                />
-
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="Enter your password"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-11 text-sm text-white outline-none placeholder:text-zinc-600 transition focus:border-red-500"
+                  required
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 pr-12 text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500"
                 />
 
                 <button
@@ -96,23 +119,33 @@ export default function LoginPage() {
                   onClick={() =>
                     setShowPassword(!showPassword)
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
                   {showPassword ? (
-                    <EyeOff size={18} />
+                    <EyeOff size={20} />
                   ) : (
-                    <Eye size={18} />
+                    <Eye size={20} />
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Login */}
+            {/* API Error */}
+            {error && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
+
+            {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-lg bg-red-600 py-3 text-sm font-semibold transition hover:bg-red-500"
+              disabled={loading}
+              className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Login
+              {loading
+                ? "Logging in..."
+                : "Login"}
             </button>
           </form>
 
@@ -121,17 +154,13 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link
               href="/register"
-              className="font-medium text-red-500 transition hover:text-red-400"
+              className="font-medium text-red-500 hover:text-red-400"
             >
-              Create one
+              Create account
             </Link>
           </p>
         </div>
-
-        <p className="mt-6 text-center text-xs text-zinc-600">
-          Train harder. Track smarter. Become stronger.
-        </p>
       </div>
-    </main>
+    </div>
   );
 }

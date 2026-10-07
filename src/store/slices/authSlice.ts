@@ -1,10 +1,5 @@
 import { loginUser, registerUser } from "@/services/authApi";
-import {
-  createSlice,
-  createAsyncThunk,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 interface User {
   id: string;
@@ -36,7 +31,7 @@ export const register = createAsyncThunk(
       email: string;
       password: string;
     },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const data = await registerUser(userData);
@@ -44,10 +39,10 @@ export const register = createAsyncThunk(
       return data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
+        error.response?.data?.message || "Registration failed",
       );
     }
-  }
+  },
 );
 
 export const login = createAsyncThunk(
@@ -57,18 +52,16 @@ export const login = createAsyncThunk(
       email: string;
       password: string;
     },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const data = await loginUser(userData);
 
       return data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Login failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Login failed");
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -101,6 +94,26 @@ const authSlice = createSlice({
       })
 
       .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // LOGIN
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+
+        localStorage.setItem("token", action.payload.token);
+      })
+
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
