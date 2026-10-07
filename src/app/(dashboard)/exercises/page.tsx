@@ -93,7 +93,7 @@ export default function ExercisesPage() {
         {filteredExercises.map((exercise) => (
           <div
             key={exercise.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition hover:border-zinc-700"
+            className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition hover:border-red-700"
           >
             {/* Top */}
             <div className="flex items-start justify-between gap-3">
@@ -124,7 +124,7 @@ export default function ExercisesPage() {
             </div>
 
             {/* Button */}
-            <button className="mt-5 w-full rounded-lg border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-900 hover:text-white">
+            <button className="mt-5 w-full rounded-lg border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-900 hover:text-white hover:border-red-500">
               View Exercise
             </button>
           </div>

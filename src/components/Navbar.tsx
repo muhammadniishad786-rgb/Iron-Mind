@@ -1,6 +1,7 @@
 "use client";
 
 import { Dumbbell, ChevronDown, User } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -16,6 +17,7 @@ export default function Navbar() {
       </div>
 
       {/* Profile */}
+      <Link href="/profile">
       <button className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-900 transition">
 
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600">
@@ -35,7 +37,7 @@ export default function Navbar() {
         {/* <ChevronDown size={18} className="text-zinc-500" /> */}
 
       </button>
-
+      </Link>
     </nav>
   );
 }
