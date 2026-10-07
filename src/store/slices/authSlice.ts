@@ -1,4 +1,4 @@
-import { registerUser } from "@/services/authApi";
+import { loginUser, registerUser } from "@/services/authApi";
 import {
   createSlice,
   createAsyncThunk,
@@ -45,6 +45,27 @@ export const register = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || "Registration failed"
+      );
+    }
+  }
+);
+
+export const login = createAsyncThunk(
+  "auth/login",
+  async (
+    userData: {
+      email: string;
+      password: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const data = await loginUser(userData);
+
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Login failed"
       );
     }
   }

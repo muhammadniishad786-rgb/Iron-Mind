@@ -9,12 +9,32 @@ import {
   Shield,
   User,
 } from "lucide-react";
+
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+
+import type { AppDispatch } from "@/store/store";
+import { logout } from "@/store/slices/authSlice";
 import { useState } from "react";
 
 export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const [workoutReminders, setWorkoutReminders] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Remove token from browser
+    localStorage.removeItem("token");
+
+    // Clear Redux authentication state
+    dispatch(logout());
+
+    // Go to login page
+    router.push("/login");
+  };
 
   return (
     <div className="p-6">
@@ -37,9 +57,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">
-              General
-            </h2>
+            <h2 className="text-lg font-semibold">General</h2>
 
             <p className="text-sm text-zinc-500">
               General application preferences.
@@ -54,9 +72,7 @@ export default function SettingsPage() {
               <Moon size={20} className="text-zinc-500" />
 
               <div>
-                <p className="text-sm font-medium">
-                  Appearance
-                </p>
+                <p className="text-sm font-medium">Appearance</p>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Choose how IronMind looks.
@@ -80,9 +96,7 @@ export default function SettingsPage() {
               <Bell size={20} className="text-zinc-500" />
 
               <div>
-                <p className="text-sm font-medium">
-                  Notifications
-                </p>
+                <p className="text-sm font-medium">Notifications</p>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Receive notifications from IronMind.
@@ -110,9 +124,7 @@ export default function SettingsPage() {
               <User size={20} className="text-zinc-500" />
 
               <div>
-                <p className="text-sm font-medium">
-                  Workout Reminders
-                </p>
+                <p className="text-sm font-medium">Workout Reminders</p>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Get reminded about your scheduled workouts.
@@ -121,9 +133,7 @@ export default function SettingsPage() {
             </div>
 
             <button
-              onClick={() =>
-                setWorkoutReminders(!workoutReminders)
-              }
+              onClick={() => setWorkoutReminders(!workoutReminders)}
               className={`relative h-6 w-11 rounded-full transition ${
                 workoutReminders ? "bg-red-600" : "bg-zinc-700"
               }`}
@@ -142,9 +152,7 @@ export default function SettingsPage() {
               <Bell size={20} className="text-zinc-500" />
 
               <div>
-                <p className="text-sm font-medium">
-                  Email Updates
-                </p>
+                <p className="text-sm font-medium">Email Updates</p>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Receive useful updates and announcements.
@@ -176,9 +184,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">
-              Security
-            </h2>
+            <h2 className="text-lg font-semibold">Security</h2>
 
             <p className="text-sm text-zinc-500">
               Manage your account security.
@@ -193,9 +199,7 @@ export default function SettingsPage() {
               <Lock size={20} className="text-zinc-500" />
 
               <div>
-                <p className="text-sm font-medium">
-                  Change Password
-                </p>
+                <p className="text-sm font-medium">Change Password</p>
 
                 <p className="mt-1 text-xs text-zinc-500">
                   Update your account password.
@@ -203,9 +207,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <span className="text-sm text-zinc-500">
-              →
-            </span>
+            <span className="text-sm text-zinc-500">→</span>
           </button>
         </div>
       </div>
@@ -218,9 +220,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">
-              Account
-            </h2>
+            <h2 className="text-lg font-semibold">Account</h2>
 
             <p className="text-sm text-zinc-500">
               Manage your IronMind account.
@@ -229,7 +229,7 @@ export default function SettingsPage() {
         </div>
 
         <button
-          onClick={() => console.log("Logout")}
+          onClick={() => handleLogout()}
           className="mt-6 flex items-center gap-2 rounded-lg border border-red-900/50 px-5 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-600 hover:text-white"
         >
           <LogOut size={17} />
