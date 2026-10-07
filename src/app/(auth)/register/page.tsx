@@ -13,28 +13,29 @@ export default function RegisterPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const { loading, error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    goal: "",
+    experience: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
 
-    // Clear confirm password error while typing
     if (e.target.name === "confirmPassword") {
       setPasswordError("");
     }
@@ -51,7 +52,7 @@ export default function RegisterPage() {
 
     setPasswordError("");
 
-    // Don't send confirmPassword to backend
+    // confirmPassword is only for frontend validation
     const { confirmPassword, ...userData } = formData;
 
     const result = await dispatch(register(userData));
@@ -62,9 +63,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black px-4">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4 py-10">
       <div className="w-full max-w-md">
-
         {/* Logo */}
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
@@ -85,12 +85,9 @@ export default function RegisterPage() {
         {/* Register Card */}
         <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-
             {/* Name */}
             <div>
-              <label className="mb-2 block text-sm text-zinc-300">
-                Name
-              </label>
+              <label className="mb-2 block text-sm text-zinc-300">Name</label>
 
               <input
                 type="text"
@@ -105,9 +102,7 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div>
-              <label className="mb-2 block text-sm text-zinc-300">
-                Email
-              </label>
+              <label className="mb-2 block text-sm text-zinc-300">Email</label>
 
               <input
                 type="email"
@@ -139,16 +134,10 @@ export default function RegisterPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} />
-                  ) : (
-                    <Eye size={20} />
-                  )}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
@@ -176,9 +165,7 @@ export default function RegisterPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
                   {showConfirmPassword ? (
@@ -190,10 +177,60 @@ export default function RegisterPage() {
               </div>
 
               {passwordError && (
-                <p className="mt-2 text-sm text-red-400">
-                  {passwordError}
-                </p>
+                <p className="mt-2 text-sm text-red-400">{passwordError}</p>
               )}
+            </div>
+
+            {/* Fitness Goal */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-300">
+                Fitness Goal
+              </label>
+
+              <select
+                name="goal"
+                value={formData.goal}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none transition focus:border-red-500"
+              >
+                <option value="" disabled>
+                  Select your goal
+                </option>
+
+                <option value="muscle_gain">Build Muscle</option>
+
+                <option value="weight_loss">Lose Weight</option>
+
+                <option value="strength">Increase Strength</option>
+
+                <option value="general_fitness">Improve Fitness</option>
+              </select>
+            </div>
+
+            {/* Experience */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-300">
+                Experience Level
+              </label>
+
+              <select
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none transition focus:border-red-500"
+              >
+                <option value="" disabled>
+                  Select your experience level
+                </option>
+
+                <option value="beginner">Beginner</option>
+
+                <option value="intermediate">Intermediate</option>
+
+                <option value="advanced">Advanced</option>
+              </select>
             </div>
 
             {/* API Error */}

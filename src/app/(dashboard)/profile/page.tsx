@@ -1,212 +1,249 @@
 "use client";
 
-import {
-  User,
-  Mail,
-  Calendar,
-  Dumbbell,
-  Pencil,
-  Save,
-} from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { User, Mail, Calendar, Dumbbell, Pencil, Save } from "lucide-react";
+import { useSelector } from "react-redux";
+
+import type { RootState } from "@/store/store";
 
 export default function ProfilePage() {
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const [isEditing, setIsEditing] = useState(false);
 
-  const [name, setName] = useState("Nishad");
-  const [email, setEmail] = useState("nishad@example.com");
-  const [goal, setGoal] = useState("Build Muscle");
-  const [experience, setExperience] = useState("Intermediate");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [goal, setGoal] = useState("");
+  const [experience, setExperience] = useState("");
+
+  // Load registered user data
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setGoal(user.goal || "");
+      setExperience(user.experience || "");
+    }
+  }, [user]);
 
   const handleSave = () => {
+    // Backend update will be added later
     setIsEditing(false);
-
-    console.log({
-      name,
-      email,
-      goal,
-      experience,
-    });
   };
 
-  return (
-    <div className="p-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">
-          My <span className="text-red-500">Profile</span>
-        </h1>
+  const formatGoal = (goal: string) => {
+    switch (goal) {
+      case "muscle_gain":
+        return "Build Muscle";
 
-        <p className="mt-2 text-zinc-400">
-          Manage your personal information and fitness preferences.
-        </p>
+      case "weight_loss":
+        return "Lose Weight";
+
+      case "strength":
+        return "Increase Strength";
+
+      case "general_fitness":
+        return "Improve Fitness";
+
+      default:
+        return goal;
+    }
+  };
+
+  const formatExperience = (experience: string) => {
+    switch (experience) {
+      case "beginner":
+        return "Beginner";
+
+      case "intermediate":
+        return "Intermediate";
+
+      case "advanced":
+        return "Advanced";
+
+      default:
+        return experience;
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
+        <p className="text-zinc-500">Loading profile...</p>
       </div>
+    );
+  }
 
-      {/* Profile Header */}
-      <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          {/* Avatar */}
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-red-600 text-3xl font-bold">
-            N
-          </div>
-
-          {/* User Info */}
+  return (
+    <div className="min-h-[calc(100vh-64px)] bg-black px-6 py-8">
+      <div className="mx-auto max-w-5xl">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">
-              {name}
-            </h2>
+            <h1 className="text-3xl font-bold text-white">Profile</h1>
 
             <p className="mt-1 text-sm text-zinc-500">
-              IronMind Member
+              Manage your personal information
             </p>
-
-            <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
-              <Calendar size={16} />
-              <span>Member since October 2026</span>
-            </div>
           </div>
 
-          {/* Edit Button */}
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="sm:ml-auto flex items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-900 hover:text-white"
-          >
-            <Pencil size={16} />
-
-            {isEditing ? "Cancel" : "Edit Profile"}
-          </button>
-        </div>
-      </div>
-
-      {/* Personal Information */}
-      <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <div>
-          <h2 className="text-lg font-semibold">
-            Personal Information
-          </h2>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            Your basic account information.
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {/* Name */}
-          <div>
-            <label className="text-sm text-zinc-400">
-              Full Name
-            </label>
-
-            <div className="relative mt-2">
-              <User
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
-              />
-
-              <input
-                type="text"
-                value={name}
-                disabled={!isEditing}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none transition disabled:cursor-not-allowed disabled:text-zinc-500 focus:border-red-500"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="text-sm text-zinc-400">
-              Email Address
-            </label>
-
-            <div className="relative mt-2">
-              <Mail
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
-              />
-
-              <input
-                type="email"
-                value={email}
-                disabled={!isEditing}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none transition disabled:cursor-not-allowed disabled:text-zinc-500 focus:border-red-500"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Fitness Information */}
-      <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <div>
-          <h2 className="text-lg font-semibold">
-            Fitness Information
-          </h2>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            Tell IronMind about your training preferences.
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {/* Goal */}
-          <div>
-            <label className="text-sm text-zinc-400">
-              Fitness Goal
-            </label>
-
-            <div className="relative mt-2">
-              <Dumbbell
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600"
-              />
-
-              <select
-                value={goal}
-                disabled={!isEditing}
-                onChange={(e) => setGoal(e.target.value)}
-                className="w-full appearance-none rounded-lg border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none transition disabled:cursor-not-allowed disabled:text-zinc-500 focus:border-red-500"
-              >
-                <option>Build Muscle</option>
-                <option>Lose Weight</option>
-                <option>Increase Strength</option>
-                <option>Improve Fitness</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Experience */}
-          <div>
-            <label className="text-sm text-zinc-400">
-              Experience Level
-            </label>
-
-            <select
-              value={experience}
-              disabled={!isEditing}
-              onChange={(e) => setExperience(e.target.value)}
-              className="mt-2 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none transition disabled:cursor-not-allowed disabled:text-zinc-500 focus:border-red-500"
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
             >
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Save */}
-        {isEditing && (
-          <div className="mt-6 flex justify-end">
+              <Pencil size={17} />
+              Edit Profile
+            </button>
+          ) : (
             <button
               onClick={handleSave}
-              className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold transition hover:bg-red-500"
+              className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
             >
               <Save size={17} />
               Save Changes
             </button>
+          )}
+        </div>
+
+        {/* Profile Card */}
+        <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+            {/* Avatar */}
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-red-600 text-3xl font-bold text-white">
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+
+            {/* User info */}
+            <div>
+              <h2 className="text-2xl font-bold text-white">{user.name}</h2>
+
+              <p className="mt-1 text-sm text-zinc-500">{user.email}</p>
+
+              <div className="mt-3 flex items-center gap-2 text-sm text-zinc-500">
+                <Calendar size={15} />
+                <span>IronMind Member</span>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Personal Information */}
+        <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-600/10">
+              <User size={20} className="text-red-500" />
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-white">Personal Information</h2>
+
+              <p className="text-sm text-zinc-500">Your account information</p>
+            </div>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            {/* Name */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-400">
+                Full Name
+              </label>
+
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-red-500"
+                />
+              ) : (
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white">
+                  {user.name}
+                </div>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-400">Email</label>
+
+              <div className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
+                <Mail size={17} className="text-zinc-500" />
+
+                <span className="text-white">{user.email}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fitness Information */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-600/10">
+              <Dumbbell size={20} className="text-red-500" />
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-white">Fitness Information</h2>
+
+              <p className="text-sm text-zinc-500">Your fitness preferences</p>
+            </div>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            {/* Goal */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-400">
+                Fitness Goal
+              </label>
+
+              {isEditing ? (
+                <select
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-red-500"
+                >
+                  <option value="muscle_gain">Build Muscle</option>
+
+                  <option value="weight_loss">Lose Weight</option>
+
+                  <option value="strength">Increase Strength</option>
+
+                  <option value="general_fitness">Improve Fitness</option>
+                </select>
+              ) : (
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white">
+                  {formatGoal(user.goal)}
+                </div>
+              )}
+            </div>
+
+            {/* Experience */}
+            <div>
+              <label className="mb-2 block text-sm text-zinc-400">
+                Experience Level
+              </label>
+
+              {isEditing ? (
+                <select
+                  value={experience}
+                  onChange={(e) => setExperience(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-red-500"
+                >
+                  <option value="beginner">Beginner</option>
+
+                  <option value="intermediate">Intermediate</option>
+
+                  <option value="advanced">Advanced</option>
+                </select>
+              ) : (
+                <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white">
+                  {formatExperience(user.experience)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

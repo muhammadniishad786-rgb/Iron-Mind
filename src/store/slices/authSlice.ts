@@ -5,6 +5,9 @@ interface User {
   id: string;
   name: string;
   email: string;
+  goal: string;
+  experience: string
+
 }
 
 interface AuthState {
@@ -30,6 +33,8 @@ export const register = createAsyncThunk(
       name: string;
       email: string;
       password: string;
+      goal: string,
+      experience: string
     },
     { rejectWithValue },
   ) => {
@@ -87,6 +92,7 @@ const authSlice = createSlice({
 
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("REGISTER RESPONSE:", action.payload);
 
         state.user = action.payload.user;
         state.token = action.payload.token;
