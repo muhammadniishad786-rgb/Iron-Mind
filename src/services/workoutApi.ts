@@ -41,7 +41,7 @@ export interface Workout {
 // =========================
 
 export const getWorkouts = async () => {
-  const response = await api.get("/api/workouts");
+  const response = await api.get("/workouts");
 
   return response.data;
 };
@@ -51,7 +51,7 @@ export const getWorkouts = async () => {
 // =========================
 
 export const getWorkoutById = async (id: string) => {
-  const response = await api.get(`/api/workouts/${id}`);
+  const response = await api.get(`/workouts/${id}`);
 
   return response.data;
 };
@@ -67,7 +67,7 @@ export const createWorkout = async (workoutData: {
   duration?: number;
 }) => {
   const response = await api.post(
-    "/api/workouts",
+    "/workouts",
     workoutData
   );
 
@@ -83,7 +83,7 @@ export const updateWorkout = async (
   workoutData: Partial<Workout>
 ) => {
   const response = await api.put(
-    `/api/workouts/${id}`,
+    `/workouts/${id}`,
     workoutData
   );
 
@@ -96,7 +96,7 @@ export const updateWorkout = async (
 
 export const deleteWorkout = async (id: string) => {
   const response = await api.delete(
-    `/api/workouts/${id}`
+    `/workouts/${id}`
   );
 
   return response.data;
@@ -114,7 +114,7 @@ export const completeWorkout = async (
   }
 ) => {
   const response = await api.patch(
-    `/api/workouts/${id}/complete`,
+    `/workouts/${id}/complete`,
     data
   );
 
@@ -127,7 +127,7 @@ export const completeWorkout = async (
 
 export const getWorkoutHistory = async () => {
   const response = await api.get(
-    "/api/workouts/history"
+    "/workouts/history"
   );
 
   return response.data;
@@ -139,7 +139,7 @@ export const getWorkoutHistory = async () => {
 
 export const getWorkoutProgress = async () => {
   const response = await api.get(
-    "/api/workouts/progress"
+    "/workouts/progress"
   );
 
   return response.data;
@@ -151,7 +151,7 @@ export const getWorkoutProgress = async () => {
 
 export const getProgressDashboard = async () => {
   const response = await api.get(
-    "/api/workouts/progress/dashboard"
+    "/workouts/progress/dashboard"
   );
 
   return response.data;
@@ -163,7 +163,7 @@ export const getProgressDashboard = async () => {
 
 export const getPersonalRecords = async () => {
   const response = await api.get(
-    "/api/workouts/progress/pr"
+    "/workouts/progress/pr"
   );
 
   return response.data;
@@ -175,7 +175,7 @@ export const getPersonalRecords = async () => {
 
 export const getWeeklyProgress = async () => {
   const response = await api.get(
-    "/api/workouts/progress/weekly"
+    "/workouts/progress/weekly"
   );
 
   return response.data;
@@ -189,7 +189,7 @@ export const getExerciseProgression = async (
   exerciseId: string
 ) => {
   const response = await api.get(
-    `/api/workouts/progress/exercise/${exerciseId}`
+    `/workouts/progress/exercise/${exerciseId}`
   );
 
   return response.data;
@@ -204,7 +204,7 @@ export const completeWorkoutExercise = async (
   exerciseId: string
 ) => {
   const response = await api.patch(
-    `/api/workouts/${workoutId}/exercises/${exerciseId}/complete`
+    `/workouts/${workoutId}/exercises/${exerciseId}/complete`
   );
 
   return response.data;
@@ -219,7 +219,7 @@ export const removeWorkoutExercise = async (
   exerciseId: string
 ) => {
   const response = await api.delete(
-    `/api/workouts/${workoutId}/exercises/${exerciseId}`
+    `/workouts/${workoutId}/exercises/${exerciseId}`
   );
 
   return response.data;
