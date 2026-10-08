@@ -16,14 +16,14 @@ export interface Exercise {
 
 // Get all exercises
 export const getExercises = async () => {
-  const response = await api.get("/api/exercises");
+  const response = await api.get("/exercises");
 
   return response.data;
 };
 
 // Get single exercise
 export const getExerciseById = async (id: string) => {
-  const response = await api.get(`/api/exercises/${id}`);
+  const response = await api.get(`/exercises/${id}`);
 
   return response.data;
 };
@@ -33,7 +33,7 @@ export const createExercise = async (
   exerciseData: Omit<Exercise, "_id" | "createdAt" | "updatedAt">
 ) => {
   const response = await api.post(
-    "/api/exercises",
+    "/exercises",
     exerciseData
   );
 
@@ -46,7 +46,7 @@ export const updateExercise = async (
   exerciseData: Partial<Exercise>
 ) => {
   const response = await api.put(
-    `/api/exercises/${id}`,
+    `/exercises/${id}`,
     exerciseData
   );
 
@@ -56,7 +56,7 @@ export const updateExercise = async (
 // Delete exercise
 export const deleteExercise = async (id: string) => {
   const response = await api.delete(
-    `/api/exercises/${id}`
+    `/exercises/${id}`
   );
 
   return response.data;

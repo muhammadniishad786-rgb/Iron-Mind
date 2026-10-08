@@ -1,56 +1,29 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-const exercises = [
-  {
-    id: 1,
-    name: "Bench Press",
-    muscleGroup: "Chest",
-    equipment: "Barbell",
-    difficulty: "Intermediate",
-  },
-  {
-    id: 2,
-    name: "Squat",
-    muscleGroup: "Legs",
-    equipment: "Barbell",
-    difficulty: "Intermediate",
-  },
-  {
-    id: 3,
-    name: "Deadlift",
-    muscleGroup: "Back",
-    equipment: "Barbell",
-    difficulty: "Advanced",
-  },
-  {
-    id: 4,
-    name: "Shoulder Press",
-    muscleGroup: "Shoulders",
-    equipment: "Dumbbell",
-    difficulty: "Intermediate",
-  },
-  {
-    id: 5,
-    name: "Bicep Curl",
-    muscleGroup: "Biceps",
-    equipment: "Dumbbell",
-    difficulty: "Beginner",
-  },
-  {
-    id: 6,
-    name: "Tricep Pushdown",
-    muscleGroup: "Triceps",
-    equipment: "Cable",
-    difficulty: "Beginner",
-  },
-];
+import type { RootState, AppDispatch } from "@/store/store";
+import { fetchExercises } from "@/store/slices/exerciseSlice";
 
 export default function ExercisesPage() {
   const [search, setSearch] = useState("");
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { exercises, loading, error } = useSelector(
+    (state: RootState) => state.exercise
+  );
+
+  // Fetch exercises from backend
+  useEffect(() => {
+    dispatch(fetchExercises());
+  }, [dispatch]);
+
+  // console.log(exercises);
+
+  // Search filter
   const filteredExercises = exercises.filter((exercise) =>
     exercise.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -87,59 +60,89 @@ export default function ExercisesPage() {
         </div>
       </div>
 
-      {/* Exercise Grid */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
-        {filteredExercises.map((exercise) => (
-          <div
-            key={exercise.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition hover:border-red-700"
-          >
-            {/* Top */}
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold">
-                  {exercise.name}
-                </h2>
-
-                <p className="mt-1 text-sm text-red-500">
-                  {exercise.muscleGroup}
-                </p>
-              </div>
-
-              <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-400">
-                {exercise.difficulty}
-              </span>
-            </div>
-
-            {/* Details */}
-            <div className="mt-5 border-t border-zinc-800 pt-4">
-              <p className="text-sm text-zinc-500">
-                Equipment
-              </p>
-
-              <p className="mt-1 text-sm text-zinc-300">
-                {exercise.equipment}
-              </p>
-            </div>
-
-            {/* Button */}
-            <button className="mt-5 w-full rounded-lg border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-900 hover:text-white hover:border-red-500">
-              View Exercise
-            </button>
-          </div>
-        ))}
-
-      </div>
-
-      {/* Empty State */}
-      {filteredExercises.length === 0 && (
+      {/* Loading */}
+      {loading && (
         <div className="mt-12 text-center">
           <p className="text-zinc-500">
-            No exercises found.
+            Loading exercises...
           </p>
         </div>
       )}
+
+      {/* Error */}
+      {error && (
+        <div className="mt-8 rounded-lg border border-red-900 bg-red-950/20 p-4">
+          <p className="text-red-500">
+            {error}
+          </p>
+        </div>
+      )}
+
+      {/* Exercise Grid */}
+      {!loading && !error && (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          {filteredExercises.map((exercise) => (
+            <div
+              key={exercise._id}
+              className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition hover:border-red-700"
+            >
+
+              {/* Top */}
+              <div className="flex items-start justify-between gap-3">
+
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    {exercise.name}
+                  </h2>
+
+                  <p className="mt-1 text-sm text-red-500">
+                    {exercise.muscleGroup}
+                  </p>
+                </div>
+
+                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-400">
+                  {exercise.difficulty}
+                </span>
+
+              </div>
+
+              {/* Details */}
+              <div className="mt-5 border-t border-zinc-800 pt-4">
+
+                <p className="text-sm text-zinc-500">
+                  Equipment
+                </p>
+
+                <p className="mt-1 text-sm text-zinc-300">
+                  {exercise.equipment}
+                </p>
+
+              </div>
+
+              {/* Button */}
+              <button
+                className="mt-5 w-full rounded-lg border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-red-500 hover:bg-zinc-900 hover:text-white"
+              >
+                View Exercise
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading &&
+        !error &&
+        filteredExercises.length === 0 && (
+          <div className="mt-12 text-center">
+            <p className="text-zinc-500">
+              No exercises found.
+            </p>
+          </div>
+        )}
 
     </div>
   );
