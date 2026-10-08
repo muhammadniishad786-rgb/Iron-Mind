@@ -1,7 +1,8 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 
 import type { RootState, AppDispatch } from "@/store/store";
@@ -21,8 +22,6 @@ export default function ExercisesPage() {
     dispatch(fetchExercises());
   }, [dispatch]);
 
-  // console.log(exercises);
-
   // Search filter
   const filteredExercises = exercises.filter((exercise) =>
     exercise.name.toLowerCase().includes(search.toLowerCase())
@@ -30,16 +29,26 @@ export default function ExercisesPage() {
 
   return (
     <div className="p-6">
-
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">
-          Exercise <span className="text-red-500">Library</span>
-        </h1>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Exercise <span className="text-red-500">Library</span>
+          </h1>
 
-        <p className="mt-2 text-zinc-400">
-          Browse exercises and find the right movements for your workouts.
-        </p>
+          <p className="mt-2 text-zinc-400">
+            Browse exercises and find the right movements for your workouts.
+          </p>
+        </div>
+
+        {/* Create Exercise */}
+        <Link
+          href="/exercises/create"
+          className="flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold transition hover:bg-red-500"
+        >
+          <Plus size={18} />
+          Add Exercise
+        </Link>
       </div>
 
       {/* Search */}
@@ -81,35 +90,30 @@ export default function ExercisesPage() {
       {/* Exercise Grid */}
       {!loading && !error && (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
           {filteredExercises.map((exercise) => (
             <div
               key={exercise._id}
               className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition hover:border-red-700"
             >
-
               {/* Top */}
               <div className="flex items-start justify-between gap-3">
-
                 <div>
                   <h2 className="text-lg font-semibold">
                     {exercise.name}
                   </h2>
 
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm capitalize text-red-500">
                     {exercise.muscleGroup}
                   </p>
                 </div>
 
-                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-400">
+                <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs capitalize text-zinc-400">
                   {exercise.difficulty}
                 </span>
-
               </div>
 
               {/* Details */}
               <div className="mt-5 border-t border-zinc-800 pt-4">
-
                 <p className="text-sm text-zinc-500">
                   Equipment
                 </p>
@@ -117,19 +121,17 @@ export default function ExercisesPage() {
                 <p className="mt-1 text-sm text-zinc-300">
                   {exercise.equipment}
                 </p>
-
               </div>
 
               {/* Button */}
-              <button
-                className="mt-5 w-full rounded-lg border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-red-500 hover:bg-zinc-900 hover:text-white"
+              <Link
+                href={`/exercises/${exercise._id}`}
+                className="mt-5 block w-full rounded-lg border border-zinc-700 py-2.5 text-center text-sm font-medium text-zinc-300 transition hover:border-red-500 hover:bg-zinc-900 hover:text-white"
               >
                 View Exercise
-              </button>
-
+              </Link>
             </div>
           ))}
-
         </div>
       )}
 
@@ -137,13 +139,21 @@ export default function ExercisesPage() {
       {!loading &&
         !error &&
         filteredExercises.length === 0 && (
-          <div className="mt-12 text-center">
+          <div className="mt-12 rounded-xl border border-zinc-800 bg-zinc-950 p-10 text-center">
             <p className="text-zinc-500">
               No exercises found.
             </p>
+
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="mt-3 text-sm text-red-500 hover:text-red-400"
+              >
+                Clear search
+              </button>
+            )}
           </div>
         )}
-
     </div>
   );
 }
