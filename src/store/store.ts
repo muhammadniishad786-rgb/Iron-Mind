@@ -3,13 +3,15 @@ import authReducer from "./slices/authSlice";
 import exerciseReducer from "./slices/exerciseSlice"
 import workoutReducer from "./slices/workoutSlice"
 import progressReducer from "./slices/progressSlice"
+import aiReducer from "./slices/aiSlice"
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     exercise: exerciseReducer,
     workout: workoutReducer,
-    progress: progressReducer
+    progress: progressReducer,
+    ai: aiReducer
   },
 });
 
