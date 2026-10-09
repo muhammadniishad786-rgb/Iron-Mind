@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Trash2, Save, Loader2, ArrowLeft } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Save,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
 import Link from "next/link";
 
 import type { RootState, AppDispatch } from "@/store/store";
@@ -11,15 +17,14 @@ import {
   fetchWorkoutById,
   editWorkout,
 } from "@/store/slices/workoutSlice";
-
 import { fetchExercises } from "@/store/slices/exerciseSlice";
 
 interface WorkoutExerciseForm {
   id: string;
   exerciseId: string;
-  sets: number;
-  reps: number;
-  weight: number;
+  sets: string;
+  reps: string;
+  weight: string;
 }
 
 export default function EditWorkoutPage() {
@@ -46,7 +51,11 @@ export default function EditWorkoutPage() {
 
   const [saving, setSaving] = useState(false);
 
-  // Fetch workout and exercises
+  // Hide number-input spinner arrows.
+  const numberInputClass =
+    "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none transition focus:border-red-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
+
+  // Fetch workout and exercises.
   useEffect(() => {
     if (workoutId) {
       dispatch(fetchWorkoutById(workoutId));
@@ -54,7 +63,7 @@ export default function EditWorkoutPage() {
     }
   }, [dispatch, workoutId]);
 
-  // Load workout data into form
+  // Populate form when workout data is available.
   useEffect(() => {
     if (!currentWorkout) return;
 
@@ -71,9 +80,9 @@ export default function EditWorkoutPage() {
         return {
           id: `${exerciseId}-${index}`,
           exerciseId,
-          sets: workoutExercise.sets || 1,
-          reps: workoutExercise.reps || 1,
-          weight: workoutExercise.weight || 0,
+          sets: String(workoutExercise.sets ?? 1),
+          reps: String(workoutExercise.reps ?? 1),
+          weight: String(workoutExercise.weight ?? 0),
         };
       }
     );
@@ -81,28 +90,28 @@ export default function EditWorkoutPage() {
     setWorkoutExercises(formattedExercises);
   }, [currentWorkout]);
 
-  // Add exercise row
+  // Add exercise.
   const handleAddExercise = () => {
     setWorkoutExercises((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        id: `${Date.now()}-${Math.random()}`,
         exerciseId: "",
-        sets: 3,
-        reps: 10,
-        weight: 0,
+        sets: "3",
+        reps: "10",
+        weight: "0",
       },
     ]);
   };
 
-  // Remove exercise row
+  // Remove exercise.
   const handleRemoveExercise = (id: string) => {
     setWorkoutExercises((prev) =>
       prev.filter((exercise) => exercise.id !== id)
     );
   };
 
-  // Update exercise field
+  // Update fields without converting typed values to numbers.
   const handleExerciseChange = (
     id: string,
     field: keyof WorkoutExerciseForm,
@@ -111,19 +120,13 @@ export default function EditWorkoutPage() {
     setWorkoutExercises((prev) =>
       prev.map((exercise) =>
         exercise.id === id
-          ? {
-              ...exercise,
-              [field]:
-                field === "exerciseId"
-                  ? value
-                  : Number(value),
-            }
+          ? { ...exercise, [field]: value }
           : exercise
       )
     );
   };
 
-  // Save workout
+  // Save workout.
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -139,12 +142,33 @@ export default function EditWorkoutPage() {
       return;
     }
 
-    const hasInvalidExercise = workoutExercises.some(
-      (exercise) => !exercise.exerciseId
-    );
-
-    if (hasInvalidExercise) {
+    if (workoutExercises.some((exercise) => !exercise.exerciseId)) {
       alert("Please select an exercise for every row.");
+      return;
+    }
+
+    const invalidExercise = workoutExercises.some((exercise) => {
+      const sets = Number(exercise.sets);
+      const reps = Number(exercise.reps);
+      const weight = Number(exercise.weight);
+
+      return (
+        exercise.sets.trim() === "" ||
+        exercise.reps.trim() === "" ||
+        exercise.weight.trim() === "" ||
+        !Number.isInteger(sets) ||
+        sets < 1 ||
+        !Number.isInteger(reps) ||
+        reps < 1 ||
+        !Number.isFinite(weight) ||
+        weight < 0
+      );
+    });
+
+    if (invalidExercise) {
+      alert(
+        "Sets and reps must be positive whole numbers. Weight must be zero or greater."
+      );
       return;
     }
 
@@ -152,13 +176,13 @@ export default function EditWorkoutPage() {
       setSaving(true);
 
       const workoutData = {
-        name,
+        name: name.trim(),
         description,
         exercises: workoutExercises.map((exercise) => ({
           exercise: exercise.exerciseId,
-          sets: exercise.sets,
-          reps: exercise.reps,
-          weight: exercise.weight,
+          sets: Number(exercise.sets),
+          reps: Number(exercise.reps),
+          weight: Number(exercise.weight),
         })),
       };
 
@@ -170,14 +194,15 @@ export default function EditWorkoutPage() {
       ).unwrap();
 
       router.push("/workouts");
-    } catch (error) {
-      console.error("Failed to update workout:", error);
+    } catch (err) {
+      console.error("Failed to update workout:", err);
+      alert("Failed to update workout. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Loading workout
+  // Loading state.
   if (loading && !currentWorkout) {
     return (
       <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
@@ -192,7 +217,7 @@ export default function EditWorkoutPage() {
     );
   }
 
-  // Workout not found
+  // Workout not found.
   if (!currentWorkout && !loading) {
     return (
       <div className="p-6">
@@ -207,7 +232,7 @@ export default function EditWorkoutPage() {
 
           <Link
             href="/workouts"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold hover:bg-red-500"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold transition hover:bg-red-500"
           >
             <ArrowLeft size={16} />
             Back to Workouts
@@ -230,10 +255,7 @@ export default function EditWorkoutPage() {
         </Link>
 
         <h1 className="text-3xl font-bold">
-          Edit{" "}
-          <span className="text-red-500">
-            Workout
-          </span>
+          Edit <span className="text-red-500">Workout</span>
         </h1>
 
         <p className="mt-2 text-zinc-400">
@@ -241,19 +263,17 @@ export default function EditWorkoutPage() {
         </p>
       </div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="max-w-4xl space-y-8"
       >
-        {/* Basic Information */}
+        {/* Workout Information */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
           <h2 className="text-xl font-semibold">
             Workout Information
           </h2>
 
           <div className="mt-5 space-y-5">
-            {/* Name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-300">
                 Workout Name
@@ -262,15 +282,12 @@ export default function EditWorkoutPage() {
               <input
                 type="text"
                 value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Example: Push Day"
                 className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500"
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-300">
                 Description
@@ -278,9 +295,7 @@ export default function EditWorkoutPage() {
 
               <textarea
                 value={description}
-                onChange={(e) =>
-                  setDescription(e.target.value)
-                }
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your workout..."
                 rows={4}
                 className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500"
@@ -312,135 +327,134 @@ export default function EditWorkoutPage() {
             </button>
           </div>
 
-          {/* Exercise rows */}
           <div className="mt-6 space-y-4">
-            {workoutExercises.map(
-              (workoutExercise, index) => (
-                <div
-                  key={workoutExercise.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
-                >
-                  <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm font-medium text-zinc-400">
-                      Exercise {index + 1}
-                    </p>
+            {workoutExercises.map((workoutExercise, index) => (
+              <div
+                key={workoutExercise.id}
+                className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-sm font-medium text-zinc-400">
+                    Exercise {index + 1}
+                  </p>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleRemoveExercise(
-                          workoutExercise.id
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveExercise(workoutExercise.id)
+                    }
+                    aria-label={`Remove exercise ${index + 1}`}
+                    className="rounded-lg p-2 text-zinc-500 transition hover:bg-red-950/30 hover:text-red-500"
+                  >
+                    <Trash2 size={17} />
+                  </button>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-4">
+                  {/* Exercise Selection */}
+                  <div className="md:col-span-4">
+                    <label className="mb-2 block text-xs font-medium text-zinc-400">
+                      Exercise
+                    </label>
+
+                    <select
+                      value={workoutExercise.exerciseId}
+                      onChange={(e) =>
+                        handleExerciseChange(
+                          workoutExercise.id,
+                          "exerciseId",
+                          e.target.value
                         )
                       }
-                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-red-950/30 hover:text-red-500"
+                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-red-500"
                     >
-                      <Trash2 size={17} />
-                    </button>
+                      <option value="">
+                        Select an exercise
+                      </option>
+
+                      {exercises.map((exercise) => (
+                        <option
+                          key={exercise._id}
+                          value={exercise._id}
+                        >
+                          {exercise.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-4">
-                    {/* Exercise */}
-                    <div className="md:col-span-4">
-                      <label className="mb-2 block text-xs font-medium text-zinc-400">
-                        Exercise
-                      </label>
+                  {/* Sets */}
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-zinc-400">
+                      Sets
+                    </label>
 
-                      <select
-                        value={
-                          workoutExercise.exerciseId
-                        }
-                        onChange={(e) =>
-                          handleExerciseChange(
-                            workoutExercise.id,
-                            "exerciseId",
-                            e.target.value
-                          )
-                        }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-red-500"
-                      >
-                        <option value="">
-                          Select an exercise
-                        </option>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputMode="numeric"
+                      value={workoutExercise.sets}
+                      onChange={(e) =>
+                        handleExerciseChange(
+                          workoutExercise.id,
+                          "sets",
+                          e.target.value
+                        )
+                      }
+                      className={numberInputClass}
+                    />
+                  </div>
 
-                        {exercises.map((exercise) => (
-                          <option
-                            key={exercise._id}
-                            value={exercise._id}
-                          >
-                            {exercise.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  {/* Reps */}
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-zinc-400">
+                      Reps
+                    </label>
 
-                    {/* Sets */}
-                    <div>
-                      <label className="mb-2 block text-xs font-medium text-zinc-400">
-                        Sets
-                      </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputMode="numeric"
+                      value={workoutExercise.reps}
+                      onChange={(e) =>
+                        handleExerciseChange(
+                          workoutExercise.id,
+                          "reps",
+                          e.target.value
+                        )
+                      }
+                      className={numberInputClass}
+                    />
+                  </div>
 
-                      <input
-                        type="number"
-                        min="1"
-                        value={workoutExercise.sets}
-                        onChange={(e) =>
-                          handleExerciseChange(
-                            workoutExercise.id,
-                            "sets",
-                            e.target.value
-                          )
-                        }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-red-500"
-                      />
-                    </div>
+                  {/* Weight */}
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-zinc-400">
+                      Weight (kg)
+                    </label>
 
-                    {/* Reps */}
-                    <div>
-                      <label className="mb-2 block text-xs font-medium text-zinc-400">
-                        Reps
-                      </label>
-
-                      <input
-                        type="number"
-                        min="1"
-                        value={workoutExercise.reps}
-                        onChange={(e) =>
-                          handleExerciseChange(
-                            workoutExercise.id,
-                            "reps",
-                            e.target.value
-                          )
-                        }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-red-500"
-                      />
-                    </div>
-
-                    {/* Weight */}
-                    <div>
-                      <label className="mb-2 block text-xs font-medium text-zinc-400">
-                        Weight (kg)
-                      </label>
-
-                      <input
-                        type="number"
-                        min="0"
-                        value={workoutExercise.weight}
-                        onChange={(e) =>
-                          handleExerciseChange(
-                            workoutExercise.id,
-                            "weight",
-                            e.target.value
-                          )
-                        }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-red-500"
-                      />
-                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      inputMode="decimal"
+                      value={workoutExercise.weight}
+                      onChange={(e) =>
+                        handleExerciseChange(
+                          workoutExercise.id,
+                          "weight",
+                          e.target.value
+                        )
+                      }
+                      className={numberInputClass}
+                    />
                   </div>
                 </div>
-              )
-            )}
+              </div>
+            ))}
 
-            {/* No exercises */}
             {workoutExercises.length === 0 && (
               <div className="rounded-xl border border-dashed border-zinc-800 p-8 text-center">
                 <p className="text-sm text-zinc-500">
@@ -450,7 +464,7 @@ export default function EditWorkoutPage() {
                 <button
                   type="button"
                   onClick={handleAddExercise}
-                  className="mt-4 text-sm font-medium text-red-500 hover:text-red-400"
+                  className="mt-4 text-sm font-medium text-red-500 transition hover:text-red-400"
                 >
                   + Add your first exercise
                 </button>
@@ -462,13 +476,11 @@ export default function EditWorkoutPage() {
         {/* Error */}
         {error && (
           <div className="rounded-lg border border-red-900 bg-red-950/20 p-4">
-            <p className="text-sm text-red-500">
-              {error}
-            </p>
+            <p className="text-sm text-red-500">{error}</p>
           </div>
         )}
 
-        {/* Actions */}
+        {/* Action Buttons */}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
             href="/workouts"
