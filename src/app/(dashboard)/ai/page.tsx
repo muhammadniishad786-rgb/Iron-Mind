@@ -34,7 +34,7 @@ export default function AIPage() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hey Nishad! 👋 I'm your IronMind AI Coach. I can help you create workouts, improve your exercises, and understand your training progress. What would you like help with today?",
+        "Hey There! 👋 I'm your IronMind AI Coach. I can help you create workouts, improve your exercises, and understand your training progress. What would you like help with today?",
     },
   ]);
 
