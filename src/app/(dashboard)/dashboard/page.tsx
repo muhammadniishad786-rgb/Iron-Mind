@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo } from "react";
@@ -74,7 +75,8 @@ function getWorkoutVolume(workout: Workout) {
       );
 
       const exerciseVolume = completedSets.reduce(
-        (sum, set) => sum + (Number(set.weight) || 0) * (Number(set.reps) || 0),
+        (sum, set) =>
+          sum + (Number(set.weight) || 0) * (Number(set.reps) || 0),
         0
       );
 
@@ -97,18 +99,6 @@ function getCompletedSetCount(workout: Workout) {
   );
 }
 
-function getExerciseNames(workout: Workout) {
-  const names = (workout.exercises ?? [])
-    .map((item) =>
-      typeof item.exercise === "string"
-        ? ""
-        : item.exercise?.name ?? ""
-    )
-    .filter(Boolean);
-
-  return names.length > 0 ? names.slice(0, 3).join(", ") : "Training session";
-}
-
 function StatCard({
   title,
   value,
@@ -121,16 +111,18 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="group rounded-2xl border border-zinc-800 bg-zinc-950 p-5 transition duration-300 hover:-translate-y-1 hover:border-red-500/40">
+    <div className="group rounded-2xl border border-zinc-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-red-500/40 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-400">{title}</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          {title}
+        </p>
 
-        <div className="rounded-xl bg-red-500/10 p-2.5 text-red-400 transition group-hover:bg-red-500/15">
+        <div className="rounded-xl bg-red-500/10 p-2.5 text-red-500 transition group-hover:bg-red-500/15 dark:text-red-400">
           <Icon size={19} />
         </div>
       </div>
 
-      <p className="mt-5 text-3xl font-bold tracking-tight text-white">
+      <p className="mt-5 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
         {value}
       </p>
 
@@ -141,8 +133,11 @@ function StatCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-800 px-5 py-9 text-center">
-      <Dumbbell className="mx-auto mb-3 text-zinc-600" size={25} />
+    <div className="rounded-xl border border-dashed border-zinc-300 px-5 py-9 text-center dark:border-zinc-800">
+      <Dumbbell
+        className="mx-auto mb-3 text-zinc-400 dark:text-zinc-600"
+        size={25}
+      />
       <p className="text-sm text-zinc-500">{message}</p>
     </div>
   );
@@ -168,8 +163,7 @@ export default function DashboardPage() {
 
   const recentWorkouts = dashboard?.recentWorkouts ?? [];
 
-  // Select the next unfinished workout. The backend does not currently
-  // expose a dedicated workout schedule.
+  // Select the next unfinished workout.
   const nextWorkout = useMemo(
     () => workouts.find((workout) => !workout.completed),
     [workouts]
@@ -194,10 +188,10 @@ export default function DashboardPage() {
 
   if (isInitialLoading) {
     return (
-      <main className="flex min-h-[70vh] items-center justify-center bg-[#090909] text-white">
+      <main className="flex min-h-[70vh] items-center justify-center bg-zinc-50 text-zinc-900 transition-colors duration-200 dark:bg-[#090909] dark:text-white">
         <div className="flex flex-col items-center gap-4">
           <LoaderCircle className="animate-spin text-red-500" size={34} />
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Loading your IronMind dashboard...
           </p>
         </div>
@@ -206,12 +200,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#090909] px-4 py-6 text-white sm:px-6 sm:py-8 lg:px-8">
+    <main className="min-h-screen bg-zinc-50 px-4 py-6 text-zinc-900 transition-colors duration-200 dark:bg-[#090909] dark:text-white sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         {/* HEADER */}
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-red-400">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-red-500 dark:text-red-400">
               Your fitness command center
             </p>
 
@@ -220,8 +214,8 @@ export default function DashboardPage() {
               <span className="text-red-500">.</span>
             </h1>
 
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              Here's your fitness overview. Keep showing up and keep getting
+            <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              Here&apos;s your fitness overview. Keep showing up and keep getting
               stronger.
             </p>
           </div>
@@ -229,7 +223,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={refreshDashboard}
-            className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-zinc-700 px-4 py-3 text-sm font-medium text-zinc-300 transition hover:border-red-500/50 hover:text-white sm:self-auto"
+            className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition hover:border-red-500/50 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-300 dark:hover:text-white sm:self-auto"
           >
             <RefreshCw size={16} />
             Refresh
@@ -238,13 +232,13 @@ export default function DashboardPage() {
 
         {/* ERROR */}
         {error && (
-          <div className="flex flex-col gap-3 rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-300 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-600 dark:text-red-300 sm:flex-row sm:items-center sm:justify-between">
             <p>{error}</p>
 
             <button
               type="button"
               onClick={refreshDashboard}
-              className="self-start font-semibold hover:text-white"
+              className="self-start font-semibold hover:text-red-800 dark:hover:text-white"
             >
               Try again
             </button>
@@ -254,8 +248,8 @@ export default function DashboardPage() {
         {/* STATS */}
         <section>
           <div className="mb-4 flex items-center gap-2">
-            <Activity className="text-red-400" size={19} />
-            <h2 className="font-semibold text-white">Your statistics</h2>
+            <Activity className="text-red-500 dark:text-red-400" size={19} />
+            <h2 className="font-semibold">Your statistics</h2>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -289,7 +283,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* TODAY'S / NEXT WORKOUT */}
+        {/* NEXT WORKOUT */}
         <section>
           <div className="mb-4">
             <h2 className="text-xl font-semibold">Your Next Workout</h2>
@@ -298,12 +292,12 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-red-900/40 bg-zinc-950 p-6 sm:p-8">
+          <div className="relative overflow-hidden rounded-2xl border border-red-200 bg-white p-6 dark:border-red-900/40 dark:bg-zinc-950 sm:p-8">
             <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-red-600/10 blur-3xl" />
 
             <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
               <div className="min-w-0">
-                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-red-400">
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-red-500 dark:text-red-400">
                   <Flame size={17} />
                   Ready when you are
                 </div>
@@ -314,25 +308,25 @@ export default function DashboardPage() {
                       {nextWorkout.name}
                     </h3>
 
-                    <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                       {nextWorkout.description ||
                         "Your next training session is waiting. Stay focused and track every set."}
                     </p>
 
-                    <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-400">
+                    <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
                       <span className="flex items-center gap-2">
-                        <Dumbbell size={16} className="text-red-400" />
+                        <Dumbbell size={16} className="text-red-500 dark:text-red-400" />
                         {getExerciseCount(nextWorkout)} exercises
                       </span>
 
                       <span className="flex items-center gap-2">
-                        <Target size={16} className="text-red-400" />
+                        <Target size={16} className="text-red-500 dark:text-red-400" />
                         {getCompletedSetCount(nextWorkout)} completed sets
                       </span>
 
                       {nextWorkout.duration ? (
                         <span className="flex items-center gap-2">
-                          <Clock3 size={16} className="text-red-400" />
+                          <Clock3 size={16} className="text-red-500 dark:text-red-400" />
                           {formatDuration(nextWorkout.duration)}
                         </span>
                       ) : null}
@@ -344,7 +338,7 @@ export default function DashboardPage() {
                       Ready for a fresh start?
                     </h3>
 
-                    <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                       You have no unfinished workouts. Create a new workout
                       and make your next session count.
                     </p>
@@ -353,7 +347,7 @@ export default function DashboardPage() {
               </div>
 
               <Link
-                href={nextWorkout ? "/workouts" : "/workouts"}
+                href="/workouts"
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-red-500"
               >
                 {nextWorkout ? "Start Workout" : "Create Workout"}
@@ -375,14 +369,14 @@ export default function DashboardPage() {
 
             <Link
               href="/workouts"
-              className="inline-flex items-center gap-2 self-start text-sm font-medium text-red-400 transition hover:text-red-300"
+              className="inline-flex items-center gap-2 self-start text-sm font-medium text-red-500 transition hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
             >
               View all workouts
               <ArrowRight size={16} />
             </Link>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
+          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
             {recentWorkouts.length === 0 ? (
               <div className="p-5">
                 <EmptyState message="No completed workouts yet. Finish your first workout to see your training history here." />
@@ -391,19 +385,19 @@ export default function DashboardPage() {
               recentWorkouts.slice(0, 4).map((workout, index) => (
                 <div
                   key={workout._id || index}
-                  className={`flex flex-col gap-4 p-5 transition hover:bg-zinc-900/50 sm:flex-row sm:items-center sm:justify-between ${
+                  className={`flex flex-col gap-4 p-5 transition hover:bg-zinc-100 dark:hover:bg-zinc-900/50 sm:flex-row sm:items-center sm:justify-between ${
                     index !== Math.min(recentWorkouts.length, 4) - 1
-                      ? "border-b border-zinc-800"
+                      ? "border-b border-zinc-200 dark:border-zinc-800"
                       : ""
                   }`}
                 >
                   <div className="flex min-w-0 items-center gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 dark:text-red-400">
                       <Dumbbell size={20} />
                     </div>
 
                     <div className="min-w-0">
-                      <h3 className="truncate font-semibold text-white">
+                      <h3 className="truncate font-semibold">
                         {workout.name}
                       </h3>
 
@@ -413,7 +407,7 @@ export default function DashboardPage() {
                           : "Completed workout"}
                       </p>
 
-                      <p className="mt-1 text-xs text-zinc-600">
+                      <p className="mt-1 text-xs text-zinc-500">
                         {formatDate(workout.completedAt || workout.createdAt)}
                       </p>
                     </div>
@@ -431,15 +425,13 @@ export default function DashboardPage() {
                       <p className="text-xs text-zinc-500">Volume</p>
                       <p className="mt-1 text-sm font-medium">
                         {formatNumber(
-                          getWorkoutVolume(
-                            workout as unknown as Workout
-                          )
+                          getWorkoutVolume(workout as unknown as Workout)
                         )}{" "}
                         kg
                       </p>
                     </div>
 
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                       <CheckCircle2 size={13} />
                       Completed
                     </span>
@@ -453,7 +445,7 @@ export default function DashboardPage() {
         {/* BOTTOM SECTION */}
         <div className="grid gap-5 lg:grid-cols-2">
           {/* WEEKLY PROGRESS */}
-          <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-7">
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 sm:p-7">
             <div className="mb-6 flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">Weekly Progress</h2>
@@ -462,13 +454,13 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl bg-red-500/10 p-2.5 text-red-400">
+              <div className="rounded-xl bg-red-500/10 p-2.5 text-red-500 dark:text-red-400">
                 <TrendingUp size={20} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-100 p-4 dark:border-zinc-800 dark:bg-zinc-900/70">
                 <p className="text-sm text-zinc-500">Workouts</p>
 
                 <p className="mt-2 text-2xl font-bold">
@@ -480,7 +472,7 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-100 p-4 dark:border-zinc-800 dark:bg-zinc-900/70">
                 <p className="text-sm text-zinc-500">Weekly Volume</p>
 
                 <p className="mt-2 text-2xl font-bold">
@@ -494,14 +486,16 @@ export default function DashboardPage() {
 
             <div className="mt-6">
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-zinc-400">Weekly goal</span>
-                <span className="font-semibold text-red-400">
+                <span className="text-zinc-600 dark:text-zinc-400">
+                  Weekly goal
+                </span>
+                <span className="font-semibold text-red-500 dark:text-red-400">
                   {goalProgress}%
                 </span>
               </div>
 
               <div
-                className="h-2.5 overflow-hidden rounded-full bg-zinc-800"
+                className="h-2.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
                 role="progressbar"
                 aria-valuenow={goalProgress}
                 aria-valuemin={0}
@@ -515,17 +509,14 @@ export default function DashboardPage() {
               </div>
 
               <p className="mt-3 text-xs text-zinc-500">
-                {Math.max(
-                  0,
-                  WEEKLY_GOAL - (thisWeek?.workouts ?? 0)
-                )}{" "}
-                more workouts to reach your weekly goal.
+                {Math.max(0, WEEKLY_GOAL - (thisWeek?.workouts ?? 0))} more
+                workouts to reach your weekly goal.
               </p>
             </div>
 
             <Link
               href="/progress"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-red-400 transition hover:text-red-300"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-red-500 transition hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
             >
               View full analytics
               <ArrowRight size={16} />
@@ -533,12 +524,12 @@ export default function DashboardPage() {
           </section>
 
           {/* AI COACH */}
-          <section className="relative overflow-hidden rounded-2xl border border-red-900/40 bg-zinc-950 p-6 sm:p-7">
+          <section className="relative overflow-hidden rounded-2xl border border-red-200 bg-white p-6 dark:border-red-900/40 dark:bg-zinc-950 sm:p-7">
             <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-red-600/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-red-600/5 blur-3xl" />
 
             <div className="relative">
-              <div className="flex items-center gap-2 text-sm font-semibold tracking-wider text-red-400">
+              <div className="flex items-center gap-2 text-sm font-semibold tracking-wider text-red-500 dark:text-red-400">
                 <Sparkles size={17} />
                 IRONMIND AI
               </div>
@@ -547,7 +538,7 @@ export default function DashboardPage() {
                 Train smarter with AI.
               </h2>
 
-              <p className="mt-3 max-w-md text-sm leading-7 text-zinc-400">
+              <p className="mt-3 max-w-md text-sm leading-7 text-zinc-600 dark:text-zinc-400">
                 Get workout suggestions, training guidance and personalized
                 fitness insights with your IronMind AI Coach.
               </p>
@@ -560,9 +551,12 @@ export default function DashboardPage() {
                 ].map((item) => (
                   <div
                     key={item}
-                    className="flex items-center gap-3 text-sm text-zinc-300"
+                    className="flex items-center gap-3 text-sm text-zinc-700 dark:text-zinc-300"
                   >
-                    <CheckCircle2 size={16} className="shrink-0 text-red-400" />
+                    <CheckCircle2
+                      size={16}
+                      className="shrink-0 text-red-500 dark:text-red-400"
+                    />
                     {item}
                   </div>
                 ))}
@@ -580,7 +574,7 @@ export default function DashboardPage() {
         </div>
 
         {/* FOOTER */}
-        <footer className="pb-3 pt-1 text-center text-xs text-zinc-600">
+        <footer className="pb-3 pt-1 text-center text-xs text-zinc-500 dark:text-zinc-600">
           Built for consistency. Powered by IronMind.
         </footer>
       </div>
