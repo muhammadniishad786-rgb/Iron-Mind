@@ -237,7 +237,7 @@ export default function SettingsPage() {
           <div className="mt-5 border-t border-zinc-200 dark:border-zinc-800">
             <button
               type="button"
-              onClick={() => router.push("/settings/change-password")}
+              onClick={() => router.push("/settings/")}
               className="flex w-full items-center justify-between gap-4 rounded-lg py-5 text-left transition hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
             >
               <div className="flex items-center gap-4">
