@@ -569,7 +569,7 @@ export default function DashboardPage() {
               </div>
 
               <Link
-                href="/ai-workout"
+                href="/ai"
                 className="mt-7 inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
               >
                 Ask AI Coach
