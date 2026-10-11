@@ -1,383 +1,302 @@
 
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 import {
-  generateAIWorkout as generateAIWorkoutApi,
-  saveAIWorkout as saveAIWorkoutApi,
-  askAI as askAIApi,
-  getAIProgression as getAIProgressionApi,
+  generateAIWorkout,
+  askAI,
+  saveAIWorkout,
+  getAIProgression,
   type GenerateAIWorkoutPayload,
   type GeneratedAIWorkout,
   type SaveAIWorkoutPayload,
   type AIProgressionResponse,
 } from "@/services/aiApi";
 
-// =========================
+// ========================================
 // TYPES
-// =========================
+// ========================================
 
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
+interface SavedAIWorkout {
+  _id?: string;
+  name?: string;
+  workoutName?: string;
+  description?: string;
+  exercises?: unknown[];
+  [key: string]: unknown;
+}
+
+interface AIProgressionHistory {
+  date: string;
+  workoutName: string;
+  maxWeight: number;
+  totalReps: number;
+  totalVolume: number;
+  sets: {
+    setNumber: number;
+    weight: number;
+    reps: number;
+  }[];
+}
+
+interface AIProgressionResult {
+  message: string;
+  progression: AIProgressionResponse;
+  history: AIProgressionHistory[];
 }
 
 interface AIState {
-  generatedWorkout: GeneratedAIWorkout | null;
-  savedWorkoutId: string | null;
-  progression: AIProgressionResponse | null;
-  progressionHistory: {
-    date: string;
-    workoutName: string;
-    maxWeight: number;
-    totalReps: number;
-    totalVolume: number;
-  }[];
-  messages: ChatMessage[];
-  generating: boolean;
+  workout: GeneratedAIWorkout | null;
+  savedWorkout: SavedAIWorkout | null;
+  response: string;
+  progression: AIProgressionResult | null;
+
+  loading: boolean;
+  chatLoading: boolean;
   saving: boolean;
-  chatting: boolean;
   progressionLoading: boolean;
+
   error: string | null;
+  chatError: string | null;
+  saveError: string | null;
+  progressionError: string | null;
+
+  saveSuccess: boolean;
 }
 
-const initialState: AIState = {
-  generatedWorkout: null,
-  savedWorkoutId: null,
-  progression: null,
-  progressionHistory: [],
-  messages: [],
-  generating: false,
-  saving: false,
-  chatting: false,
-  progressionLoading: false,
-  error: null,
+// ========================================
+// ERROR HANDLER
+// ========================================
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (axios.isAxiosError<{ message?: string }>(error)) {
+    return error.response?.data?.message ?? fallback;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
 };
 
-// =========================
-// ERROR HELPER
-// =========================
+// ========================================
+// GENERATE AI WORKOUT
+// POST /api/ai/generate-workout
+// ========================================
 
-function getErrorMessage(
-  error: unknown,
-  fallback: string
-): string {
-  const err = error as {
-    response?: {
-      data?: {
-        message?: string;
-        error?: string;
-      };
-    };
-    message?: string;
-  };
-
-  return (
-    err.response?.data?.message ||
-    err.response?.data?.error ||
-    err.message ||
-    fallback
-  );
-}
-
-// =========================
-// GENERATE WORKOUT
-// =========================
-
-export const generateAIWorkout = createAsyncThunk<
+export const generateWorkout = createAsyncThunk<
   GeneratedAIWorkout,
   GenerateAIWorkoutPayload,
   { rejectValue: string }
->(
-  "ai/generateWorkout",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response =
-        await generateAIWorkoutApi(payload);
-
-      return response.workout;
-    } catch (error) {
-      return rejectWithValue(
-        getErrorMessage(
-          error,
-          "Failed to generate workout"
-        )
-      );
-    }
+>("ai/generateWorkout", async (payload, { rejectWithValue }) => {
+  try {
+    const data = await generateAIWorkout(payload);
+    return data.workout;
+  } catch (error: unknown) {
+    return rejectWithValue(
+      getErrorMessage(error, "Failed to generate workout")
+    );
   }
-);
+});
 
-// =========================
-// SAVE WORKOUT
-// =========================
+// ========================================
+// SAVE AI WORKOUT
+// POST /api/ai/save-workout
+// ========================================
 
-export const saveAIWorkout = createAsyncThunk<
-  { workoutId: string },
+export const saveWorkout = createAsyncThunk<
+  SavedAIWorkout,
   SaveAIWorkoutPayload,
   { rejectValue: string }
->(
-  "ai/saveWorkout",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response =
-        await saveAIWorkoutApi(payload);
-
-      const workout =
-        response.workout ??
-        response.data?.workout;
-
-      if (!workout?._id) {
-        throw new Error(
-          "Workout was saved, but no workout ID was returned"
-        );
-      }
-
-      return { workoutId: workout._id };
-    } catch (error) {
-      return rejectWithValue(
-        getErrorMessage(
-          error,
-          "Failed to save AI workout"
-        )
-      );
-    }
+>("ai/saveWorkout", async (payload, { rejectWithValue }) => {
+  try {
+    const data = await saveAIWorkout(payload);
+    return data.workout as SavedAIWorkout;
+  } catch (error: unknown) {
+    return rejectWithValue(
+      getErrorMessage(error, "Failed to save workout")
+    );
   }
-);
+});
 
-// =========================
-// CHAT
-// =========================
+// ========================================
+// AI CHAT
+// POST /api/ai/chat
+// ========================================
 
 export const sendAIMessage = createAsyncThunk<
-  ChatMessage,
+  string,
   string,
   { rejectValue: string }
->(
-  "ai/sendMessage",
-  async (message, { rejectWithValue }) => {
-    try {
-      const response = await askAIApi(message);
-
-      return {
-        id: `${Date.now()}-assistant`,
-        role: "assistant",
-        content: response.message,
-      };
-    } catch (error) {
-      return rejectWithValue(
-        getErrorMessage(
-          error,
-          "Failed to get AI response"
-        )
-      );
-    }
+>("ai/sendAIMessage", async (message, { rejectWithValue }) => {
+  try {
+    const data = await askAI(message);
+    return data.message;
+  } catch (error: unknown) {
+    return rejectWithValue(
+      getErrorMessage(error, "Failed to get AI response")
+    );
   }
-);
+});
 
-// =========================
-// PROGRESSION
-// =========================
+// ========================================
+// AI PROGRESSION
+// POST /api/ai/progression
+// ========================================
 
-export const fetchAIProgression =
-  createAsyncThunk<
-    {
-      progression: AIProgressionResponse;
-      history: AIState["progressionHistory"];
-    },
-    string,
-    { rejectValue: string }
-  >(
-    "ai/fetchProgression",
-    async (exerciseId, { rejectWithValue }) => {
-      try {
-        const response =
-          await getAIProgressionApi(exerciseId);
+export const getProgression = createAsyncThunk<
+  AIProgressionResult,
+  string,
+  { rejectValue: string }
+>("ai/getProgression", async (exerciseId, { rejectWithValue }) => {
+  try {
+    return await getAIProgression(exerciseId);
+  } catch (error: unknown) {
+    return rejectWithValue(
+      getErrorMessage(error, "Failed to generate AI progression")
+    );
+  }
+});
 
-        return {
-          progression: response.progression,
-          history: response.history.map(
-            (item) => ({
-              date: item.date,
-              workoutName: item.workoutName,
-              maxWeight: item.maxWeight,
-              totalReps: item.totalReps,
-              totalVolume: item.totalVolume,
-            })
-          ),
-        };
-      } catch (error) {
-        return rejectWithValue(
-          getErrorMessage(
-            error,
-            "Failed to analyze progression"
-          )
-        );
-      }
-    }
-  );
+// ========================================
+// INITIAL STATE
+// ========================================
 
-// =========================
+const initialState: AIState = {
+  workout: null,
+  savedWorkout: null,
+  response: "",
+  progression: null,
+
+  loading: false,
+  chatLoading: false,
+  saving: false,
+  progressionLoading: false,
+
+  error: null,
+  chatError: null,
+  saveError: null,
+  progressionError: null,
+
+  saveSuccess: false,
+};
+
+// ========================================
 // SLICE
-// =========================
+// ========================================
 
 const aiSlice = createSlice({
   name: "ai",
   initialState,
 
   reducers: {
-    clearAIError(state) {
+    clearWorkout: (state) => {
+      state.workout = null;
       state.error = null;
     },
 
-    clearGeneratedWorkout(state) {
-      state.generatedWorkout = null;
-      state.savedWorkoutId = null;
+    clearAIResponse: (state) => {
+      state.response = "";
+      state.chatError = null;
     },
 
-    clearAIProgression(state) {
+    clearSaveStatus: (state) => {
+      state.saveSuccess = false;
+      state.saveError = null;
+      state.savedWorkout = null;
+    },
+
+    clearProgression: (state) => {
       state.progression = null;
-      state.progressionHistory = [];
-    },
-
-    addUserMessage(
-      state,
-      action: PayloadAction<string>
-    ) {
-      state.messages.push({
-        id: `${Date.now()}-user`,
-        role: "user",
-        content: action.payload,
-      });
-    },
-
-    clearAIChat(state) {
-      state.messages = [];
+      state.progressionError = null;
     },
   },
 
   extraReducers: (builder) => {
-    // Generate workout
     builder
-      .addCase(
-        generateAIWorkout.pending,
-        (state) => {
-          state.generating = true;
-          state.error = null;
-          state.savedWorkoutId = null;
-        }
-      )
-      .addCase(
-        generateAIWorkout.fulfilled,
-        (state, action) => {
-          state.generating = false;
-          state.generatedWorkout = action.payload;
-        }
-      )
-      .addCase(
-        generateAIWorkout.rejected,
-        (state, action) => {
-          state.generating = false;
-          state.error =
-            action.payload ??
-            "Failed to generate workout";
-        }
-      );
+      // --------------------
+      // GENERATE WORKOUT
+      // --------------------
+      .addCase(generateWorkout.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.workout = null;
+      })
+      .addCase(generateWorkout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.workout = action.payload;
+      })
+      .addCase(generateWorkout.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload ?? action.error.message ?? "Failed to generate workout";
+      })
 
-    // Save workout
-    builder
-      .addCase(
-        saveAIWorkout.pending,
-        (state) => {
-          state.saving = true;
-          state.error = null;
-        }
-      )
-      .addCase(
-        saveAIWorkout.fulfilled,
-        (state, action) => {
-          state.saving = false;
-          state.savedWorkoutId =
-            action.payload.workoutId;
-        }
-      )
-      .addCase(
-        saveAIWorkout.rejected,
-        (state, action) => {
-          state.saving = false;
-          state.error =
-            action.payload ??
-            "Failed to save workout";
-        }
-      );
+      // --------------------
+      // SAVE WORKOUT
+      // --------------------
+      .addCase(saveWorkout.pending, (state) => {
+        state.saving = true;
+        state.saveError = null;
+        state.saveSuccess = false;
+      })
+      .addCase(saveWorkout.fulfilled, (state, action) => {
+        state.saving = false;
+        state.savedWorkout = action.payload;
+        state.saveSuccess = true;
+      })
+      .addCase(saveWorkout.rejected, (state, action) => {
+        state.saving = false;
+        state.saveError =
+          action.payload ?? action.error.message ?? "Failed to save workout";
+        state.saveSuccess = false;
+      })
 
-    // Chat
-    builder
-      .addCase(
-        sendAIMessage.pending,
-        (state) => {
-          state.chatting = true;
-          state.error = null;
-        }
-      )
-      .addCase(
-        sendAIMessage.fulfilled,
-        (state, action) => {
-          state.chatting = false;
-          state.messages.push(action.payload);
-        }
-      )
-      .addCase(
-        sendAIMessage.rejected,
-        (state, action) => {
-          state.chatting = false;
-          state.error =
-            action.payload ??
-            "Failed to get AI response";
-        }
-      );
+      // --------------------
+      // AI CHAT
+      // --------------------
+      .addCase(sendAIMessage.pending, (state) => {
+        state.chatLoading = true;
+        state.chatError = null;
+      })
+      .addCase(sendAIMessage.fulfilled, (state, action) => {
+        state.chatLoading = false;
+        state.response = action.payload;
+      })
+      .addCase(sendAIMessage.rejected, (state, action) => {
+        state.chatLoading = false;
+        state.chatError =
+          action.payload ?? action.error.message ?? "Failed to get AI response";
+      })
 
-    // Progression
-    builder
-      .addCase(
-        fetchAIProgression.pending,
-        (state) => {
-          state.progressionLoading = true;
-          state.error = null;
-          state.progression = null;
-        }
-      )
-      .addCase(
-        fetchAIProgression.fulfilled,
-        (state, action) => {
-          state.progressionLoading = false;
-          state.progression =
-            action.payload.progression;
-          state.progressionHistory =
-            action.payload.history;
-        }
-      )
-      .addCase(
-        fetchAIProgression.rejected,
-        (state, action) => {
-          state.progressionLoading = false;
-          state.error =
-            action.payload ??
-            "Failed to analyze progression";
-        }
-      );
+      // --------------------
+      // AI PROGRESSION
+      // --------------------
+      .addCase(getProgression.pending, (state) => {
+        state.progressionLoading = true;
+        state.progressionError = null;
+        state.progression = null;
+      })
+      .addCase(getProgression.fulfilled, (state, action) => {
+        state.progressionLoading = false;
+        state.progression = action.payload;
+      })
+      .addCase(getProgression.rejected, (state, action) => {
+        state.progressionLoading = false;
+        state.progressionError =
+          action.payload ??
+          action.error.message ??
+          "Failed to generate AI progression";
+      });
   },
 });
 
 export const {
-  clearAIError,
-  clearGeneratedWorkout,
-  clearAIProgression,
-  addUserMessage,
-  clearAIChat,
+  clearWorkout,
+  clearAIResponse,
+  clearSaveStatus,
+  clearProgression,
 } = aiSlice.actions;
 
 export default aiSlice.reducer;
