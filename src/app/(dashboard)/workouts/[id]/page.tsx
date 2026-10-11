@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -58,6 +59,22 @@ export default function ViewWorkoutPage() {
     SessionExercise[]
   >([]);
   const [sessionError, setSessionError] = useState<string | null>(null);
+
+  // Theme-aware styles
+  const cardClass =
+    "rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-950";
+
+  const inputClass =
+    "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-red-500 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white";
+
+  const secondaryText =
+    "text-zinc-600 dark:text-zinc-400";
+
+  const mutedText =
+    "text-zinc-500 dark:text-zinc-500";
+
+  const nestedSurface =
+    "bg-zinc-100 dark:bg-zinc-900";
 
   // Fetch the selected workout.
   useEffect(() => {
@@ -233,7 +250,6 @@ export default function ViewWorkoutPage() {
             weight: plannedExercise?.weight ?? 0,
             restTime: plannedExercise?.restTime,
 
-            // setNumber is required by the backend Mongoose schema.
             performedSets: sessionExercise.sets.map((set, index) => ({
               setNumber: index + 1,
               reps: set.reps,
@@ -290,6 +306,7 @@ export default function ViewWorkoutPage() {
       router.push("/workouts");
     } catch (err) {
       console.error("Failed to delete workout:", err);
+
       setSessionError(
         typeof err === "string"
           ? err
@@ -304,9 +321,12 @@ export default function ViewWorkoutPage() {
     (currentWorkout && currentWorkout._id !== workoutId)
   ) {
     return (
-      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <Loader2 size={20} className="animate-spin text-red-500" />
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-zinc-50 text-zinc-600 dark:bg-black dark:text-zinc-400">
+        <div className="flex items-center gap-2">
+          <Loader2
+            size={20}
+            className="animate-spin text-red-500"
+          />
           Loading workout...
         </div>
       </div>
@@ -316,17 +336,19 @@ export default function ViewWorkoutPage() {
   // Not found state.
   if (!currentWorkout) {
     return (
-      <div className="p-6">
-        <div className="mx-auto max-w-3xl rounded-xl border border-red-900 bg-red-950/20 p-10 text-center">
-          <h2 className="text-xl font-semibold">Workout not found</h2>
+      <div className="min-h-screen bg-zinc-50 p-4 text-zinc-900 sm:p-6 dark:bg-black dark:text-white">
+        <div className="mx-auto max-w-3xl rounded-xl border border-red-200 bg-white p-10 text-center dark:border-red-900 dark:bg-red-950/20">
+          <h2 className="text-xl font-semibold">
+            Workout not found
+          </h2>
 
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             {error || "Unable to load this workout."}
           </p>
 
           <Link
             href="/workouts"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold transition hover:bg-red-500"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500"
           >
             <ArrowLeft size={16} />
             Back to Workouts
@@ -350,23 +372,23 @@ export default function ViewWorkoutPage() {
   );
 
   return (
-    <div className="min-h-full p-4 text-white sm:p-6">
+    <div className="min-h-screen bg-zinc-50 p-4 text-zinc-900 transition-colors sm:p-6 dark:bg-black dark:text-white">
       <div className="mx-auto max-w-5xl">
         {/* Back navigation */}
         <Link
           href="/workouts"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-red-500 dark:text-zinc-400 dark:hover:text-white"
         >
           <ArrowLeft size={16} />
           Back to Workouts
         </Link>
 
         {/* Workout header */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5 sm:p-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-colors sm:p-6 dark:border-zinc-800 dark:bg-zinc-950">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
             <div>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-600/10 text-red-500">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600 dark:bg-red-600/10 dark:text-red-500">
                   <Dumbbell size={25} />
                 </div>
 
@@ -382,7 +404,7 @@ export default function ViewWorkoutPage() {
               </div>
 
               {currentWorkout.description && (
-                <p className="mt-5 max-w-2xl text-sm leading-6 text-zinc-400">
+                <p className="mt-5 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                   {currentWorkout.description}
                 </p>
               )}
@@ -391,10 +413,10 @@ export default function ViewWorkoutPage() {
             <span
               className={`inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
                 currentWorkout.completed
-                  ? "bg-green-500/10 text-green-500"
+                  ? "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-500"
                   : isWorkoutStarted
-                    ? "bg-red-500/10 text-red-400"
-                    : "bg-zinc-800 text-zinc-400"
+                    ? "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400"
+                    : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
               }`}
             >
               {currentWorkout.completed ? (
@@ -412,12 +434,12 @@ export default function ViewWorkoutPage() {
           </div>
 
           {/* Header actions */}
-          <div className="mt-6 flex flex-col gap-3 border-t border-zinc-800 pt-6 sm:flex-row sm:flex-wrap">
+          <div className="mt-6 flex flex-col gap-3 border-t border-zinc-200 pt-6 sm:flex-row sm:flex-wrap dark:border-zinc-800">
             {!currentWorkout.completed && !isWorkoutStarted && (
               <button
                 type="button"
                 onClick={handleStartWorkout}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold transition hover:bg-red-500"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
               >
                 <Play size={17} />
                 Start Workout
@@ -427,7 +449,7 @@ export default function ViewWorkoutPage() {
             {!isWorkoutStarted && (
               <Link
                 href={`/workouts/${currentWorkout._id}/edit`}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 px-5 py-3 text-sm font-semibold transition hover:bg-zinc-900"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-300 px-5 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
               >
                 <Pencil size={16} />
                 Edit Workout
@@ -438,7 +460,7 @@ export default function ViewWorkoutPage() {
               type="button"
               onClick={handleDelete}
               disabled={loading || isWorkoutStarted}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-900/70 px-5 py-3 text-sm font-medium text-red-500 transition hover:bg-red-950/30 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/70 dark:text-red-500 dark:hover:bg-red-950/30"
             >
               <Trash2 size={16} />
               Delete Workout
@@ -448,12 +470,12 @@ export default function ViewWorkoutPage() {
 
         {/* Workout statistics */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+          <div className={cardClass}>
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-red-600/10 p-2 text-red-500">
+              <div className="rounded-lg bg-red-100 p-2 text-red-600 dark:bg-red-600/10 dark:text-red-500">
                 <Dumbbell size={19} />
               </div>
-              <p className="text-sm text-zinc-500">Exercises</p>
+              <p className={`text-sm ${secondaryText}`}>Exercises</p>
             </div>
 
             <p className="mt-4 text-2xl font-bold">
@@ -461,48 +483,48 @@ export default function ViewWorkoutPage() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+          <div className={cardClass}>
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-red-600/10 p-2 text-red-500">
+              <div className="rounded-lg bg-red-100 p-2 text-red-600 dark:bg-red-600/10 dark:text-red-500">
                 <Clock size={19} />
               </div>
-              <p className="text-sm text-zinc-500">Duration</p>
+              <p className={`text-sm ${secondaryText}`}>Duration</p>
             </div>
 
             <p className="mt-4 text-2xl font-bold">
               {isWorkoutStarted
                 ? Math.floor(elapsedSeconds / 60)
                 : currentWorkout.duration || 0}
-              <span className="ml-1 text-sm font-normal text-zinc-500">
+              <span className={`ml-1 text-sm font-normal ${mutedText}`}>
                 min
               </span>
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+          <div className={cardClass}>
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-red-600/10 p-2 text-red-500">
+              <div className="rounded-lg bg-red-100 p-2 text-red-600 dark:bg-red-600/10 dark:text-red-500">
                 <BarChart3 size={19} />
               </div>
-              <p className="text-sm text-zinc-500">Volume</p>
+              <p className={`text-sm ${secondaryText}`}>Volume</p>
             </div>
 
             <p className="mt-4 text-2xl font-bold">
               {volume >= 1000
                 ? `${(volume / 1000).toFixed(1)}K`
                 : volume}
-              <span className="ml-1 text-sm font-normal text-zinc-500">
+              <span className={`ml-1 text-sm font-normal ${mutedText}`}>
                 kg
               </span>
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+          <div className={cardClass}>
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-red-600/10 p-2 text-red-500">
+              <div className="rounded-lg bg-red-100 p-2 text-red-600 dark:bg-red-600/10 dark:text-red-500">
                 <CheckCircle2 size={19} />
               </div>
-              <p className="text-sm text-zinc-500">Status</p>
+              <p className={`text-sm ${secondaryText}`}>Status</p>
             </div>
 
             <p className="mt-4 text-lg font-bold">
@@ -518,10 +540,10 @@ export default function ViewWorkoutPage() {
         {/* Active workout session */}
         {isWorkoutStarted && !currentWorkout.completed && (
           <section className="mt-8 space-y-5">
-            <div className="rounded-2xl border border-red-500/30 bg-red-950/20 p-5 sm:p-6">
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-5 sm:p-6 dark:border-red-500/30 dark:bg-red-950/20">
               <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-red-400">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-red-600 dark:text-red-400">
                     Training Session
                   </p>
 
@@ -529,14 +551,14 @@ export default function ViewWorkoutPage() {
                     Stay focused.
                   </h2>
 
-                  <p className="mt-1 text-sm text-zinc-400">
+                  <p className={`mt-1 text-sm ${secondaryText}`}>
                     Complete each set and record your actual reps and weight.
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
-                  <div className="flex items-center gap-2 text-sm text-zinc-400">
-                    <Timer size={16} className="text-red-400" />
+                <div className="rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className={`flex items-center gap-2 text-sm ${secondaryText}`}>
+                    <Timer size={16} className="text-red-500" />
                     Elapsed time
                   </div>
 
@@ -548,13 +570,13 @@ export default function ViewWorkoutPage() {
 
               <div className="mt-5">
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-zinc-400">Sets completed</span>
-                  <span className="font-semibold text-white">
+                  <span className={secondaryText}>Sets completed</span>
+                  <span className="font-semibold">
                     {completedSets} / {totalSets}
                   </span>
                 </div>
 
-                <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                   <div
                     className="h-full rounded-full bg-red-500 transition-all"
                     style={{
@@ -572,16 +594,16 @@ export default function ViewWorkoutPage() {
             {sessionExercises.map((exercise, exerciseIndex) => (
               <div
                 key={`${exercise.exerciseId}-${exerciseIndex}`}
-                className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5"
+                className={cardClass}
               >
                 <div className="mb-5 flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 font-bold text-red-500">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100 font-bold text-red-600 dark:bg-red-600/10 dark:text-red-500">
                     {exerciseIndex + 1}
                   </span>
 
                   <div>
                     <h3 className="font-semibold">{exercise.name}</h3>
-                    <p className="text-xs text-zinc-500">
+                    <p className={`text-xs ${mutedText}`}>
                       {exercise.sets.length} sets planned
                     </p>
                   </div>
@@ -593,22 +615,23 @@ export default function ViewWorkoutPage() {
                       key={set.setNumber}
                       className={`grid grid-cols-1 items-end gap-3 rounded-xl border p-3 sm:grid-cols-[70px_1fr_1fr_auto] ${
                         set.completed
-                          ? "border-green-900/60 bg-green-950/10"
-                          : "border-zinc-800 bg-zinc-900/60"
+                          ? "border-green-200 bg-green-50 dark:border-green-900/60 dark:bg-green-950/10"
+                          : "border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60"
                       }`}
                     >
                       <div className="pb-2">
                         <p className="text-sm font-semibold">
                           Set {set.setNumber}
                         </p>
+
                         {set.completed && (
-                          <span className="text-xs text-green-500">
+                          <span className="text-xs text-green-600 dark:text-green-500">
                             Done
                           </span>
                         )}
                       </div>
 
-                      <label className="text-xs text-zinc-400">
+                      <label className={`text-xs ${secondaryText}`}>
                         Reps
                         <input
                           type="number"
@@ -627,11 +650,11 @@ export default function ViewWorkoutPage() {
                               )
                             )
                           }
-                          className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none focus:border-red-500 disabled:opacity-60"
+                          className={inputClass}
                         />
                       </label>
 
-                      <label className="text-xs text-zinc-400">
+                      <label className={`text-xs ${secondaryText}`}>
                         Weight (kg)
                         <input
                           type="number"
@@ -650,7 +673,7 @@ export default function ViewWorkoutPage() {
                               )
                             )
                           }
-                          className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none focus:border-red-500 disabled:opacity-60"
+                          className={inputClass}
                         />
                       </label>
 
@@ -661,7 +684,7 @@ export default function ViewWorkoutPage() {
                         }
                         className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                           set.completed
-                            ? "bg-green-600/10 text-green-400 hover:bg-green-600/20"
+                            ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-600/10 dark:text-green-400 dark:hover:bg-green-600/20"
                             : "bg-red-600 text-white hover:bg-red-500"
                         }`}
                       >
@@ -677,7 +700,7 @@ export default function ViewWorkoutPage() {
             {sessionError && (
               <div
                 role="alert"
-                className="rounded-xl border border-red-900 bg-red-950/30 p-4 text-sm text-red-300"
+                className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
               >
                 {sessionError}
               </div>
@@ -698,7 +721,7 @@ export default function ViewWorkoutPage() {
               {loading ? "Saving Workout..." : "Complete Workout"}
             </button>
 
-            <p className="text-center text-xs text-zinc-500">
+            <p className={`text-center text-xs ${mutedText}`}>
               Make sure your sets are recorded before completing the workout.
             </p>
           </section>
@@ -714,7 +737,7 @@ export default function ViewWorkoutPage() {
                   : "Exercises"}
               </h2>
 
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className={`mt-1 text-sm ${secondaryText}`}>
                 {currentWorkout.completed
                   ? "Review the sets recorded for this workout."
                   : "Exercises included in this workout."}
@@ -737,12 +760,12 @@ export default function ViewWorkoutPage() {
                   return (
                     <div
                       key={`${exerciseKey}-${index}`}
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 p-5"
+                      className={cardClass}
                     >
                       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <div>
                           <div className="flex items-center gap-3">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/10 text-sm font-bold text-red-500">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-sm font-bold text-red-600 dark:bg-red-600/10 dark:text-red-500">
                               {index + 1}
                             </span>
 
@@ -753,15 +776,15 @@ export default function ViewWorkoutPage() {
 
                           {exercise && (
                             <div className="mt-3 flex flex-wrap gap-2">
-                              <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-500">
-                                {exercise.muscleGroup}
+                              <span className={`rounded-full px-3 py-1 text-xs ${nestedSurface} ${secondaryText}`}>
+                                {exercise.muscleGroup.replace(/_/g, " ")}
                               </span>
 
-                              <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-500">
-                                {exercise.equipment}
+                              <span className={`rounded-full px-3 py-1 text-xs ${nestedSurface} ${secondaryText}`}>
+                                {exercise.equipment.replace(/_/g, " ")}
                               </span>
 
-                              <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-500">
+                              <span className={`rounded-full px-3 py-1 text-xs ${nestedSurface} ${secondaryText}`}>
                                 {exercise.difficulty}
                               </span>
                             </div>
@@ -769,7 +792,7 @@ export default function ViewWorkoutPage() {
                         </div>
 
                         {workoutExercise.completed && (
-                          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-green-500/10 px-3 py-1.5 text-xs font-medium text-green-500">
+                          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-green-100 px-3 py-1.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-500">
                             <CheckCircle2 size={14} />
                             Completed
                           </span>
@@ -777,32 +800,32 @@ export default function ViewWorkoutPage() {
                       </div>
 
                       <div className="mt-5 grid grid-cols-3 gap-3">
-                        <div className="rounded-lg bg-zinc-900 p-4 text-center">
+                        <div className={`rounded-lg p-4 text-center ${nestedSurface}`}>
                           <p className="text-xl font-bold">
                             {workoutExercise.sets}
                           </p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className={`mt-1 text-xs ${secondaryText}`}>
                             Sets
                           </p>
                         </div>
 
-                        <div className="rounded-lg bg-zinc-900 p-4 text-center">
+                        <div className={`rounded-lg p-4 text-center ${nestedSurface}`}>
                           <p className="text-xl font-bold">
                             {workoutExercise.reps}
                           </p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className={`mt-1 text-xs ${secondaryText}`}>
                             Reps
                           </p>
                         </div>
 
-                        <div className="rounded-lg bg-zinc-900 p-4 text-center">
+                        <div className={`rounded-lg p-4 text-center ${nestedSurface}`}>
                           <p className="text-xl font-bold">
                             {workoutExercise.weight}
-                            <span className="ml-1 text-xs font-normal text-zinc-500">
+                            <span className={`ml-1 text-xs font-normal ${secondaryText}`}>
                               kg
                             </span>
                           </p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className={`mt-1 text-xs ${secondaryText}`}>
                             Weight
                           </p>
                         </div>
@@ -810,8 +833,8 @@ export default function ViewWorkoutPage() {
 
                       {workoutExercise.performedSets &&
                         workoutExercise.performedSets.length > 0 && (
-                          <div className="mt-5 border-t border-zinc-800 pt-5">
-                            <h4 className="mb-3 text-sm font-semibold text-zinc-300">
+                          <div className="mt-5 border-t border-zinc-200 pt-5 dark:border-zinc-800">
+                            <h4 className="mb-3 text-sm font-semibold">
                               Performed Sets
                             </h4>
 
@@ -820,18 +843,18 @@ export default function ViewWorkoutPage() {
                                 (set, setIndex) => (
                                   <div
                                     key={setIndex}
-                                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-zinc-900 px-4 py-3"
+                                    className={`flex flex-wrap items-center justify-between gap-3 rounded-lg px-4 py-3 ${nestedSurface}`}
                                   >
-                                    <span className="text-sm text-zinc-400">
-                                      Set {setIndex + 1}
+                                    <span className={`text-sm ${secondaryText}`}>
+                                      Set {set.setNumber ?? setIndex + 1}
                                     </span>
 
                                     <div className="flex items-center gap-4 text-sm">
-                                      <span className="text-zinc-300">
+                                      <span className={secondaryText}>
                                         {set.reps} reps
                                       </span>
 
-                                      <span className="text-zinc-300">
+                                      <span className={secondaryText}>
                                         {set.weight} kg
                                       </span>
 
@@ -841,7 +864,7 @@ export default function ViewWorkoutPage() {
                                           className="text-green-500"
                                         />
                                       ) : (
-                                        <span className="text-xs text-zinc-500">
+                                        <span className={`text-xs ${mutedText}`}>
                                           Not completed
                                         </span>
                                       )}
@@ -858,13 +881,13 @@ export default function ViewWorkoutPage() {
               )}
 
               {currentWorkout.exercises?.length === 0 && (
-                <div className="rounded-xl border border-dashed border-zinc-800 p-10 text-center">
+                <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center dark:border-zinc-800 dark:bg-zinc-950">
                   <Dumbbell
                     size={32}
-                    className="mx-auto text-zinc-700"
+                    className="mx-auto text-zinc-400 dark:text-zinc-700"
                   />
 
-                  <p className="mt-3 text-sm text-zinc-500">
+                  <p className={`mt-3 text-sm ${secondaryText}`}>
                     No exercises in this workout.
                   </p>
                 </div>
