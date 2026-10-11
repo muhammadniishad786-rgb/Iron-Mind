@@ -99,26 +99,28 @@ export default function AIPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     void sendMessage(message);
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] flex-col p-4 sm:p-6">
+    <div className="flex min-h-[calc(100vh-64px)] flex-col bg-white p-4 text-zinc-900 transition-colors duration-200 dark:bg-black dark:text-white sm:p-6">
       {/* Header */}
       <div>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-600/10">
-            <Bot className="text-red-500" size={22} />
+            <Bot className="text-red-600 dark:text-red-500" size={22} />
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold text-white">
-              AI <span className="text-red-500">Coach</span>
+            <h1 className="text-3xl font-bold">
+              AI <span className="text-red-600 dark:text-red-500">Coach</span>
             </h1>
 
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               Your personal AI fitness assistant.
             </p>
           </div>
@@ -126,7 +128,7 @@ export default function AIPage() {
       </div>
 
       {/* Chat Area */}
-      <div className="mt-8 flex min-h-[480px] flex-1 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+      <div className="mt-8 flex min-h-[480px] flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 transition-colors duration-200 dark:border-zinc-800 dark:bg-zinc-950">
         {/* Messages */}
         <div
           className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6"
@@ -157,7 +159,7 @@ export default function AIPage() {
                   <div
                     className={`rounded-xl px-4 py-3 ${
                       isAssistant
-                        ? "rounded-tl-none bg-zinc-900 text-zinc-300"
+                        ? "rounded-tl-none bg-white text-zinc-700 shadow-sm dark:bg-zinc-900 dark:text-zinc-300"
                         : "rounded-tr-none bg-red-600 text-white"
                     }`}
                   >
@@ -167,7 +169,7 @@ export default function AIPage() {
                   </div>
 
                   <p
-                    className={`mt-1 text-[10px] text-zinc-600 ${
+                    className={`mt-1 text-[10px] text-zinc-500 dark:text-zinc-600 ${
                       isAssistant ? "text-left" : "text-right"
                     }`}
                   >
@@ -176,7 +178,7 @@ export default function AIPage() {
                 </div>
 
                 {!isAssistant && (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-300">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                     <User size={18} />
                   </div>
                 )}
@@ -191,11 +193,11 @@ export default function AIPage() {
                 <Bot size={18} />
               </div>
 
-              <div className="rounded-xl rounded-tl-none bg-zinc-900 px-4 py-3">
-                <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <div className="rounded-xl rounded-tl-none bg-white px-4 py-3 shadow-sm dark:bg-zinc-900">
+                <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                   <LoaderCircle
                     size={16}
-                    className="animate-spin text-red-500"
+                    className="animate-spin text-red-600 dark:text-red-500"
                   />
                   Your AI Coach is thinking...
                 </div>
@@ -206,7 +208,7 @@ export default function AIPage() {
           {/* Error Message */}
           {error && (
             <div className="ml-12 max-w-2xl rounded-xl border border-red-500/20 bg-red-500/10 p-4">
-              <div className="flex items-start gap-2 text-sm text-red-400">
+              <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400">
                 <AlertCircle size={18} className="mt-0.5 shrink-0" />
                 <p>{error}</p>
               </div>
@@ -223,7 +225,7 @@ export default function AIPage() {
                   }
                 }}
                 disabled={chatLoading}
-                className="mt-3 flex items-center gap-2 text-xs font-medium text-red-400 transition hover:text-red-300 disabled:opacity-50"
+                className="mt-3 flex items-center gap-2 text-xs font-medium text-red-600 transition hover:text-red-500 disabled:opacity-50 dark:text-red-400 dark:hover:text-red-300"
               >
                 <RefreshCw size={14} />
                 Try again
@@ -235,7 +237,7 @@ export default function AIPage() {
         </div>
 
         {/* Suggestions and Input */}
-        <div className="border-t border-zinc-800 p-4">
+        <div className="border-t border-zinc-200 p-4 dark:border-zinc-800">
           <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
             {suggestions.map((suggestion) => (
               <button
@@ -243,7 +245,7 @@ export default function AIPage() {
                 type="button"
                 onClick={() => setMessage(suggestion)}
                 disabled={chatLoading}
-                className="whitespace-nowrap rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2 text-xs text-zinc-400 transition hover:border-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="whitespace-nowrap rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs text-zinc-600 transition hover:border-red-500 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:text-white"
               >
                 {suggestion}
               </button>
@@ -252,11 +254,11 @@ export default function AIPage() {
 
           <form
             onSubmit={handleSubmit}
-            className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-2 transition focus-within:border-red-500/60"
+            className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white p-2 transition focus-within:border-red-500 dark:border-zinc-800 dark:bg-zinc-900"
           >
             <Sparkles
               size={20}
-              className="ml-2 shrink-0 text-red-500"
+              className="ml-2 shrink-0 text-red-600 dark:text-red-500"
             />
 
             <input
@@ -266,7 +268,7 @@ export default function AIPage() {
               placeholder="Ask your AI Coach..."
               disabled={chatLoading}
               aria-label="Message your AI Coach"
-              className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-zinc-600 disabled:opacity-60"
+              className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 disabled:opacity-60 dark:text-white dark:placeholder:text-zinc-600"
             />
 
             <button
@@ -283,7 +285,7 @@ export default function AIPage() {
             </button>
           </form>
 
-          <p className="mt-3 text-center text-[11px] text-zinc-600">
+          <p className="mt-3 text-center text-[11px] text-zinc-500 dark:text-zinc-600">
             AI-generated fitness guidance. Listen to your body and train safely.
           </p>
         </div>
