@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -65,7 +66,7 @@ function Panel({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 sm:p-6 ${className}`}
+      className={`rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-950 sm:p-6 ${className}`}
     >
       {children}
     </section>
@@ -83,13 +84,19 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-5 flex items-start gap-3">
-      <div className="rounded-xl bg-red-500/10 p-2.5 text-red-400">
+      <div className="rounded-xl bg-red-500/10 p-2.5 text-red-600 dark:text-red-400">
         <Icon size={19} />
       </div>
+
       <div>
-        <h2 className="font-semibold text-white">{title}</h2>
+        <h2 className="font-semibold text-zinc-900 dark:text-white">
+          {title}
+        </h2>
+
         {subtitle && (
-          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {subtitle}
+          </p>
         )}
       </div>
     </div>
@@ -110,29 +117,39 @@ function StatCard({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 transition hover:border-zinc-700">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-5 transition duration-300 hover:border-red-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-red-900">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-400">{title}</p>
-        <div className="rounded-xl bg-red-500/10 p-2.5 text-red-400">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          {title}
+        </p>
+
+        <div className="rounded-xl bg-red-500/10 p-2.5 text-red-600 dark:text-red-400">
           <Icon size={19} />
         </div>
       </div>
 
       <div className="mt-5 flex flex-wrap items-baseline gap-2">
-        <p className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+        <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
           {value}
         </p>
-        {suffix && <span className="text-sm text-zinc-500">{suffix}</span>}
+
+        {suffix && (
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            {suffix}
+          </span>
+        )}
       </div>
 
-      <p className="mt-2 text-xs text-zinc-500">{description}</p>
+      <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+        {description}
+      </p>
     </div>
   );
 }
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
+    <div className="rounded-xl border border-dashed border-zinc-300 px-4 py-10 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       {message}
     </div>
   );
@@ -186,6 +203,7 @@ export default function ProgressPage() {
   );
 
   const dailyWorkouts = weeklyProgress?.dailyWorkouts ?? [];
+
   const maxDailyWorkouts = Math.max(
     1,
     ...dailyWorkouts.map((day) => Number(day.workouts) || 0)
@@ -203,12 +221,25 @@ export default function ProgressPage() {
   const recentWorkouts = dashboard?.recentWorkouts ?? [];
   const topExercises = dashboard?.topExercises ?? [];
 
+  const secondaryText = "text-zinc-500 dark:text-zinc-400";
+  const mainText = "text-zinc-900 dark:text-white";
+
+  const insetClass =
+    "rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/60";
+
+  const selectClass =
+    "w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-red-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white sm:max-w-xs";
+
   if (loading && !dashboard) {
     return (
-      <main className="min-h-screen bg-[#090909] p-5 text-white sm:p-8">
+      <main className="min-h-screen bg-zinc-50 p-5 text-zinc-900 transition-colors dark:bg-[#090909] dark:text-white sm:p-8">
         <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center gap-4">
-          <LoaderCircle className="animate-spin text-red-400" size={34} />
-          <p className="text-sm text-zinc-400">
+          <LoaderCircle
+            className="animate-spin text-red-500 dark:text-red-400"
+            size={34}
+          />
+
+          <p className={`text-sm ${secondaryText}`}>
             Loading your training progress...
           </p>
         </div>
@@ -217,18 +248,21 @@ export default function ProgressPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#090909] px-4 py-6 text-white sm:px-6 sm:py-8 lg:px-8">
+    <main className="min-h-screen bg-zinc-50 px-4 py-6 text-zinc-900 transition-colors duration-300 dark:bg-[#090909] dark:text-white sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-7">
         {/* HEADER */}
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-red-400">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-red-600 dark:text-red-400">
               Performance center
             </p>
+
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Your Progress<span className="text-red-500">.</span>
+              Your Progress
+              <span className="text-red-500">.</span>
             </h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+
+            <p className={`mt-2 max-w-xl text-sm leading-6 ${secondaryText}`}>
               Track your consistency, training volume, and strength over time.
             </p>
           </div>
@@ -239,11 +273,12 @@ export default function ProgressPage() {
               dispatch(fetchProgressDashboard());
               dispatch(fetchProgressPersonalRecords());
               dispatch(fetchProgressWeekly());
+
               if (selectedExercise) {
                 dispatch(fetchExerciseProgression(selectedExercise));
               }
             }}
-            className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-red-500/60 hover:bg-red-500/5 sm:self-auto"
+            className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-red-400 hover:bg-red-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-red-500/60 dark:hover:bg-red-500/5 sm:self-auto"
           >
             <RefreshCw size={15} />
             Refresh
@@ -252,8 +287,9 @@ export default function ProgressPage() {
 
         {/* ERROR */}
         {error && (
-          <div className="flex flex-col gap-3 rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-300 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/5 dark:text-red-300 sm:flex-row sm:items-center sm:justify-between">
             <p>{error}</p>
+
             <button
               type="button"
               onClick={() => {
@@ -261,7 +297,7 @@ export default function ProgressPage() {
                 dispatch(fetchProgressPersonalRecords());
                 dispatch(fetchProgressWeekly());
               }}
-              className="self-start font-semibold hover:text-white"
+              className="self-start font-semibold hover:text-red-900 dark:hover:text-white"
             >
               Try again
             </button>
@@ -276,12 +312,14 @@ export default function ProgressPage() {
             icon={Dumbbell}
             description="All-time completed sessions"
           />
+
           <StatCard
             title="Training time"
             value={formatDuration(dashboard?.totalDuration)}
             icon={Clock3}
             description="Total recorded duration"
           />
+
           <StatCard
             title="Training volume"
             value={formatNumber(dashboard?.totalVolume)}
@@ -289,12 +327,14 @@ export default function ProgressPage() {
             icon={Weight}
             description="Weight × reps across completed sets"
           />
+
           <StatCard
             title="Total sets"
             value={formatNumber(dashboard?.totalSets)}
             icon={Target}
             description="Completed training sets"
           />
+
           <StatCard
             title="Total reps"
             value={formatNumber(dashboard?.totalReps)}
@@ -315,16 +355,17 @@ export default function ProgressPage() {
             <div className="space-y-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-zinc-400">Workouts</p>
-                  <p className="mt-1 text-2xl font-bold">
+                  <p className={`text-sm ${secondaryText}`}>Workouts</p>
+                  <p className={`mt-1 text-2xl font-bold ${mainText}`}>
                     {formatNumber(thisWeek?.workouts)}
                   </p>
                 </div>
+
                 <div
                   className={`flex items-center gap-1 text-sm ${
                     workoutDifference >= 0
-                      ? "text-emerald-400"
-                      : "text-red-400"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-red-600 dark:text-red-400"
                   }`}
                 >
                   {workoutDifference >= 0 ? (
@@ -332,38 +373,41 @@ export default function ProgressPage() {
                   ) : (
                     <ArrowDownRight size={17} />
                   )}
+
                   {Math.abs(workoutDifference)} sessions
                 </div>
               </div>
 
-              <div className="h-px bg-zinc-800" />
+              <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
 
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-zinc-400">Duration</p>
-                  <p className="mt-1 text-xl font-bold">
+                  <p className={`text-sm ${secondaryText}`}>Duration</p>
+                  <p className={`mt-1 text-xl font-bold ${mainText}`}>
                     {formatDuration(thisWeek?.duration)}
                   </p>
                 </div>
-                <p className="text-xs text-zinc-500">
+
+                <p className={`text-right text-xs ${secondaryText}`}>
                   Last week: {formatDuration(lastWeek?.duration)}
                 </p>
               </div>
 
-              <div className="h-px bg-zinc-800" />
+              <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
 
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-zinc-400">Volume</p>
-                  <p className="mt-1 text-xl font-bold">
+                  <p className={`text-sm ${secondaryText}`}>Volume</p>
+                  <p className={`mt-1 text-xl font-bold ${mainText}`}>
                     {formatNumber(thisWeek?.volume)} kg
                   </p>
                 </div>
+
                 <div
                   className={`flex items-center gap-1 text-sm ${
                     volumeDifference >= 0
-                      ? "text-emerald-400"
-                      : "text-red-400"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-red-600 dark:text-red-400"
                   }`}
                 >
                   {volumeDifference >= 0 ? (
@@ -371,6 +415,7 @@ export default function ProgressPage() {
                   ) : (
                     <ArrowDownRight size={16} />
                   )}
+
                   {formatNumber(Math.abs(volumeDifference))} kg
                 </div>
               </div>
@@ -399,9 +444,10 @@ export default function ProgressPage() {
                       key={`${day.date}-${index}`}
                       className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"
                     >
-                      <span className="text-xs text-zinc-400">
+                      <span className={`text-xs ${secondaryText}`}>
                         {day.workouts}
                       </span>
+
                       <div className="flex h-[72%] w-full items-end justify-center">
                         <div
                           title={`${day.workouts} workouts`}
@@ -409,7 +455,8 @@ export default function ProgressPage() {
                           style={{ height: `${height}%` }}
                         />
                       </div>
-                      <span className="max-w-full truncate text-[10px] text-zinc-500 sm:text-xs">
+
+                      <span className={`max-w-full truncate text-[10px] sm:text-xs ${secondaryText}`}>
                         {formatDate(day.date).split(" ")[0]}
                       </span>
                     </div>
@@ -440,14 +487,16 @@ export default function ProgressPage() {
                   return (
                     <div key={muscle}>
                       <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-                        <span className="capitalize text-zinc-300">
-                          {muscle}
+                        <span className="capitalize text-zinc-700 dark:text-zinc-300">
+                          {muscle.replace(/_/g, " ")}
                         </span>
-                        <span className="text-zinc-400">
+
+                        <span className={secondaryText}>
                           {formatNumber(numericVolume)} kg
                         </span>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+
+                      <div className="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-red-700 to-red-400"
                           style={{ width: `${percentage}%` }}
@@ -474,24 +523,28 @@ export default function ProgressPage() {
                 {topExercises.map((exercise, index) => (
                   <div
                     key={exercise.exerciseId || `${exercise.exerciseName}-${index}`}
-                    className="flex items-center gap-3 rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-3"
+                    className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800/80 dark:bg-zinc-900/60"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-sm font-bold text-red-400">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-sm font-bold text-red-600 dark:bg-zinc-800 dark:text-red-400">
                       {String(index + 1).padStart(2, "0")}
                     </div>
+
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white">
+                      <p className={`truncate text-sm font-semibold ${mainText}`}>
                         {exercise.exerciseName}
                       </p>
-                      <p className="mt-1 text-xs capitalize text-zinc-500">
+
+                      <p className={`mt-1 text-xs capitalize ${secondaryText}`}>
                         {exercise.muscleGroup || "Exercise"}
                       </p>
                     </div>
+
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-zinc-200">
+                      <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                         {formatNumber(exercise.totalVolume)} kg
                       </p>
-                      <p className="mt-1 text-xs text-zinc-500">Volume</p>
+
+                      <p className={`mt-1 text-xs ${secondaryText}`}>Volume</p>
                     </div>
                   </div>
                 ))}
@@ -515,28 +568,34 @@ export default function ProgressPage() {
               {personalRecords.map((record, index) => (
                 <div
                   key={`${record.exerciseId}-${index}`}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4"
+                  className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-white">
+                      <p className={`truncate font-semibold ${mainText}`}>
                         {record.exerciseName}
                       </p>
-                      <p className="mt-1 text-xs capitalize text-zinc-500">
+
+                      <p className={`mt-1 text-xs capitalize ${secondaryText}`}>
                         {record.muscleGroup || "Personal record"}
                       </p>
                     </div>
-                    <Trophy className="shrink-0 text-amber-400" size={19} />
+
+                    <Trophy
+                      className="shrink-0 text-amber-500 dark:text-amber-400"
+                      size={19}
+                    />
                   </div>
 
                   <div className="mt-5 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-red-400">
+                    <span className="text-3xl font-bold text-red-600 dark:text-red-400">
                       {formatNumber(record.maxWeight)}
                     </span>
-                    <span className="text-sm text-zinc-400">kg</span>
+
+                    <span className={`text-sm ${secondaryText}`}>kg</span>
                   </div>
 
-                  <div className="mt-3 flex items-center justify-between gap-2 text-xs text-zinc-500">
+                  <div className={`mt-3 flex items-center justify-between gap-2 text-xs ${secondaryText}`}>
                     <span>{record.maxWeightReps} reps</span>
                     <span>{formatDate(record.achievedAt)}</span>
                   </div>
@@ -558,7 +617,7 @@ export default function ProgressPage() {
             <select
               value={selectedExercise}
               onChange={(event) => setSelectedExercise(event.target.value)}
-              className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none focus:border-red-500 sm:max-w-xs"
+              className={selectClass}
             >
               {topExercises.map((exercise) => (
                 <option
@@ -574,23 +633,28 @@ export default function ProgressPage() {
           {!selectedExercise ? (
             <EmptyState message="Complete a workout to select an exercise and view its progression." />
           ) : progressionLoading ? (
-            <div className="flex items-center justify-center gap-3 py-12 text-sm text-zinc-400">
-              <LoaderCircle size={20} className="animate-spin text-red-400" />
+            <div className={`flex items-center justify-center gap-3 py-12 text-sm ${secondaryText}`}>
+              <LoaderCircle
+                size={20}
+                className="animate-spin text-red-500 dark:text-red-400"
+              />
               Loading exercise progression...
             </div>
           ) : !exerciseProgression?.progress?.length ? (
             <EmptyState message="No progression history is available for this exercise yet." />
           ) : (
             <>
-              <div className="mb-5 rounded-xl bg-zinc-950/70 p-4">
-                <p className="text-sm text-zinc-400">
+              <div className="mb-5 rounded-xl bg-zinc-100 p-4 dark:bg-zinc-900/70">
+                <p className={`text-sm ${secondaryText}`}>
                   Selected exercise
                 </p>
-                <h3 className="mt-1 text-lg font-semibold">
+
+                <h3 className={`mt-1 text-lg font-semibold ${mainText}`}>
                   {exerciseProgression.exercise?.name || "Exercise progression"}
                 </h3>
+
                 {exerciseProgression.exercise?.muscleGroup && (
-                  <p className="mt-1 text-xs capitalize text-zinc-500">
+                  <p className={`mt-1 text-xs capitalize ${secondaryText}`}>
                     {exerciseProgression.exercise.muscleGroup}
                   </p>
                 )}
@@ -600,31 +664,35 @@ export default function ProgressPage() {
                 {exerciseProgression.progress.map((entry, index) => (
                   <div
                     key={`${entry.workoutId}-${entry.date}-${index}`}
-                    className="grid grid-cols-1 gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
+                    className="grid grid-cols-1 gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
+                      <p className={`truncate text-sm font-medium ${mainText}`}>
                         {entry.workoutName}
                       </p>
-                      <p className="mt-1 text-xs text-zinc-500">
+
+                      <p className={`mt-1 text-xs ${secondaryText}`}>
                         {formatDate(entry.date)}
                       </p>
                     </div>
+
                     <div>
-                      <p className="text-xs text-zinc-500">Max weight</p>
-                      <p className="mt-1 font-semibold text-red-400">
+                      <p className={`text-xs ${secondaryText}`}>Max weight</p>
+                      <p className="mt-1 font-semibold text-red-600 dark:text-red-400">
                         {formatNumber(entry.maxWeight)} kg
                       </p>
                     </div>
+
                     <div>
-                      <p className="text-xs text-zinc-500">Total reps</p>
-                      <p className="mt-1 font-semibold text-zinc-200">
+                      <p className={`text-xs ${secondaryText}`}>Total reps</p>
+                      <p className="mt-1 font-semibold text-zinc-800 dark:text-zinc-200">
                         {formatNumber(entry.totalReps)}
                       </p>
                     </div>
+
                     <div>
-                      <p className="text-xs text-zinc-500">Volume</p>
-                      <p className="mt-1 font-semibold text-zinc-200">
+                      <p className={`text-xs ${secondaryText}`}>Volume</p>
+                      <p className="mt-1 font-semibold text-zinc-800 dark:text-zinc-200">
                         {formatNumber(entry.totalVolume)} kg
                       </p>
                     </div>
@@ -650,27 +718,30 @@ export default function ProgressPage() {
               {recentWorkouts.map((workout, index) => (
                 <div
                   key={workout._id || index}
-                  className="flex flex-col justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 sm:flex-row sm:items-center"
+                  className="flex flex-col justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50 sm:flex-row sm:items-center"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="rounded-xl bg-red-500/10 p-3 text-red-400">
+                    <div className="rounded-xl bg-red-500/10 p-3 text-red-600 dark:text-red-400">
                       <Dumbbell size={19} />
                     </div>
+
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-white">
+                      <p className={`truncate font-semibold ${mainText}`}>
                         {workout.name}
                       </p>
-                      <p className="mt-1 text-xs text-zinc-500">
+
+                      <p className={`mt-1 text-xs ${secondaryText}`}>
                         {formatDate(workout.completedAt || workout.createdAt)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 pl-1 sm:pl-0">
-                    <span className="text-sm text-zinc-400">
+                    <span className={`text-sm ${secondaryText}`}>
                       {formatDuration(workout.duration)}
                     </span>
-                    <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400">
                       Completed
                     </span>
                   </div>
@@ -680,7 +751,7 @@ export default function ProgressPage() {
           )}
         </Panel>
 
-        <p className="pb-3 text-center text-xs text-zinc-600">
+        <p className="pb-3 text-center text-xs text-zinc-500 dark:text-zinc-600">
           Keep showing up. Your progress is built one session at a time.
         </p>
       </div>
